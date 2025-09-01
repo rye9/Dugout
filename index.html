@@ -133,7 +133,7 @@ const PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "A
 const POSITIONS = ["1B","2B","3B","SS","LF","CF","RF","—"];
 const $ = (sel)=>document.querySelector(sel);
 const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
-const nameKey=(p)=>`${p.first}, ${p.number}`;
+const nameKey=(p)=>`${p.last}, ${p.first}`;
 const short=(p)=>`${p.first} (${p.number})`;
 const get=(id)=>PLAYERS.find(p=>p.id===id);
 function alpha(list){ return [...list].sort((a,b)=>nameKey(a).localeCompare(nameKey(b))); }
