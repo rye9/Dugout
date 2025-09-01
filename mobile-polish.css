@@ -35,7 +35,9 @@ section, .section {
   border: 1px solid var(--card-b);
   border-radius: 12px;
   margin-bottom: var(--gap-m);
-  gap: 12px; /* keeps your flex layout neat */
+  gap: 12px;
+  display: grid;                 /* allow stacking/responsive */
+  grid-auto-rows: minmax(44px, auto);
 }
 .roster-controls::before{
   content: "Settings";
@@ -67,22 +69,19 @@ section, .section {
 }
 
 /* ---------- GAME SETUP ---------- */
-.setup-block {
-  display: grid;
-  gap: var(--gap-m);
-}
+.setup-block { display: grid; gap: var(--gap-m); }
 
 /* Role rows (Starting / Relief / Closing) */
 .role-row {
   display: grid;
-  grid-template-columns: minmax(0,1fr) auto auto auto;
-  gap: var(--gap-s);
+  grid-template-columns: minmax(0,1fr) 120px 120px auto; /* role | innings | pitches | pill */
+  gap: var(--gap-m);                                     /* wider gap so controls breathe */
   align-items: end;
-  padding-top: 10px;               /* extra breathing room */
+  padding-top: 12px;
 }
 .role-row + .role-row{
-  margin-top: 18px;                /* space between groups */
-  padding-top: 14px;
+  margin-top: 22px;
+  padding-top: 18px;
   border-top: 1px dashed var(--card-b);
 }
 
@@ -97,9 +96,9 @@ section, .section {
 .role-row .cell { display: grid; gap: var(--gap-xxs); }
 input[type="number"] { text-align: center; min-width: 54px; }
 
-/* pill style for pitch/rest info */
+/* Rest-day pill */
 .pill {
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 999px;
   font-size: 12px;
   line-height: 1;
@@ -107,6 +106,10 @@ input[type="number"] { text-align: center; min-width: 54px; }
   background: rgba(255,255,255,0.05);
   text-align: center;
   white-space: nowrap;
+  margin-left: 8px;      /* space away from "Pitches" when side-by-side */
+  margin-right: 8px;     /* buffer from next block */
+  margin-top: 6px;       /* buffer when stacked vertically */
+  margin-bottom: 6px;
 }
 
 /* ---------- Buttons ---------- */
@@ -117,20 +120,34 @@ button, .btn {
   background: rgba(255,255,255,0.08);
 }
 
+/* ---------- INNINGS TRACKER ---------- */
+/* Your tracker pills often contain a text line + .bar underneath. */
+.badge { padding: 8px 12px; }      /* more inner padding overall */
+.bar {
+  height: 8px;
+  background: #0e1627;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 8px;                 /* <- space between text and green bar */
+}
+.bar > span { display: block; height: 8px; background: #22c55e; }
+
 /* ---------- MOBILE (phones) ---------- */
 @media (max-width: 720px) {
-  /* Roster stays 2-col */
+  /* Roster: Settings stack to single column on phones */
+  .roster-controls { grid-template-columns: 1fr; }
+
+  /* Roster: player fields remain 2-col on phones */
   .card .grid, .player-card__fields { grid-template-columns: 1fr 1fr; }
 
   /* Pitchers & Catchers stack vertically */
   .role-row { grid-template-columns: 1fr !important; }
   .role-row > .cell { margin-bottom: 12px; }
-  .role-row + .role-row { margin-top: 22px; padding-top: 18px; } /* a bit more space on phones */
+  .role-row + .role-row { margin-top: 24px; padding-top: 20px; }
 
   .setup-block { display: flex; flex-direction: column; gap: 18px; }
 
-  /* Minimum Defensive Innings Tracker: single column list
-     (assumes the list right after the panel's H2 uses .flex) */
+  /* Innings Tracker: single column list (if list uses .flex) */
   .panel h2 + .flex { flex-direction: column; gap: 12px; }
 }
 
@@ -140,6 +157,6 @@ button, .btn {
     grid-template-columns: repeat(4, minmax(0,1fr));
   }
   .role-row {
-    grid-template-columns: minmax(280px,2fr) 110px 110px auto;
+    grid-template-columns: minmax(280px,2fr) 120px 120px auto;
   }
 }
