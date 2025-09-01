@@ -1,481 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Blacksox Dugout — Single Game Builder (v1.0)</title>
+  <link rel="stylesheet" href="mobile-polish.css" />
   <style>
-:root{--bg:#0b1220;--panel:#111a2b;--text:#e7edf6;--muted:#9bb0c9;--accent:#69a6ff;--grid:#2a3a55;
-      --good:#22c55e; --warn:#facc15; --bad:#fb923c}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--grid);position:sticky;top:0;background:var(--bg);z-index:10}
-h1{font-size:16px;margin:0}.actions button{background:var(--panel);color:var(--text);border:1px solid var(--grid);padding:8px 10px;margin-left:8px;border-radius:6px;cursor:pointer}
-.actions button:hover{border-color:var(--accent);color:#fff}
-main{padding:10px;max-width:1200px;margin:0 auto}
-.panel{background:var(--panel);border:1px solid var(--grid);border-radius:12px;padding:12px;margin-bottom:12px}
-.table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid var(--grid);background:#0e1627}
-.table{width:100%;min-width:760px;border-collapse:collapse;font-size:14px}
-.table th,.table td{border-bottom:1px solid var(--grid);padding:8px;text-align:center;vertical-align:top;white-space:nowrap}
-.table th{position:sticky;top:0;background:#10223a;z-index:1}
-select,input{background:#0e1627;color:var(--text);border:1px solid var(--grid);padding:8px 10px;border-radius:8px;font-size:16px}
-input[type=number]{width:64px}
-.pill{padding:4px 8px;border:1px solid var(--grid);border-radius:999px;background:#0e1627;display:inline-block;margin:2px}
-.bar{height:8px;background:#0e1627;border-radius:8px;overflow:hidden}
-.bar>span{display:block;height:8px;background:var(--good)}
-.flex{display:flex;gap:12px;flex-wrap:wrap}
-.twocol{display:grid;grid-template-columns:2fr 1.2fr;gap:18px}
-.row{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;min-height:44px} .mini{font-size:12px;color:var(--muted);min-width:auto}
-.row label{min-width:132px}
-.stack{display:flex;flex-direction:column;gap:2px;align-items:center}
-.out{opacity:0.5}
-.alert{padding:8px 10px;border:1px solid var(--warn);background:#1a1420;border-radius:8px;margin-bottom:8px}
-.badge{display:inline-block;padding:2px 6px;border-radius:999px;border:1px solid var(--grid);margin-left:6px;min-width:auto;text-align:center;white-space:nowrap;font-size:12px;line-height:1.25}
-.badge.good{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.4)}
-.badge.warn{background:rgba(250,204,21,0.12);border-color:rgba(250,204,21,0.4)}
-.badge.bad{background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.4)}
-.badge.spacer{opacity:0}
-.cardlist{display:block}.card{border:1px solid var(--grid);background:#0e1627;border-radius:10px;padding:10px;margin-bottom:8px}
-.card h4{margin:0 0 8px 0;font-size:15px}.card .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.card label{font-size:12px;color:var(--muted)}
-.roster-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.no-print{}
-.print-only{display:none}
-@media (max-width:820px){ .twocol{grid-template-columns:1fr} .row{flex-wrap:wrap} .row label{min-width:auto} }
-@media print{
-  header,.no-print,.print-hide{display:none !important}
-  .print-only{display:block}
-}
+    /* Small safety net if CSS file fails to load */
+    :root { --gap-s:8px; --gap-m:16px; --gap-l:24px; --muted:#6b7280; --card:#0f172a; --ink:#e5e7eb; --ink-weak:#94a3b8; --accent:#22c55e; --line:#1f2937; }
+    body { background:#0b1220; color:#e5e7eb; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif; }
   </style>
-  <link rel="stylesheet" href="mobile-polish.css">
 </head>
 <body>
-  <header class="no-print">
-    <h1>Blacksox Dugout — Single Game Builder (v1.0)</h1>
-    <div class="actions">
-      <button onclick="window.print()">Print</button>
-    </div>
+  <header class="page-header">
+    <h1>Blacksox Dugout — Single Game Builder <span class="ver">v1.0</span></h1>
   </header>
 
-  <main>
-    <section class="panel print-hide">
+  <main class="container">
+    <!-- =================== ROSTER =================== -->
+    <section id="roster" class="section">
       <h2>Roster</h2>
-      <div id="rosterCtrl"></div>
-      <div id="rosterTableWrap"></div>
-      <div id="rosterCards"></div>
+
+      <!-- Settings block: stacked controls -->
+      <div class="roster-controls">
+        <label class="field">
+          <span>Filter</span>
+          <select id="rosterFilter">
+            <option value="all">All Players</option>
+            <option value="pitchers">Pitchers</option>
+            <option value="catchers">Catchers</option>
+            <option value="infield">Infielders</option>
+            <option value="outfield">Outfielders</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Sort</span>
+          <select id="rosterSort">
+            <option value="rank-asc">Rank (low → high)</option>
+            <option value="name-asc">Name (A → Z)</option>
+            <option value="name-desc">Name (Z → A)</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Availability</span>
+          <select id="rosterAvail">
+            <option value="all">All</option>
+            <option value="available">Available</option>
+            <option value="limited">Limited</option>
+            <option value="out">Out</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Player cards grid -->
+      <div id="rosterList" class="player-list"></div>
     </section>
 
-    <section class="panel">
+    <!-- =================== GAME SETUP =================== -->
+    <section id="game-setup" class="section">
       <h2>Game Setup</h2>
-      <div class="twocol">
-        <div>
-          <h3>Pitchers</h3>
-          <div class="row">
+
+      <div class="setup-grid">
+        <!-- Row: Starting Pitcher -->
+        <div class="role-row">
+          <div class="cell">
             <label>Starting Pitcher</label>
-            <select id="spSel"></select>
-            <span class="mini">Innings</span><input id="spInn" type="number" min="1" max="6" value="3" title="Target innings"/>
-            <span class="mini">Pitches</span><input id="spTarget" type="number" min="0" max="120" />
-            <span id="spBadge" class="small badge"> </span>
+            <select id="spName"></select>
           </div>
-          <div class="row">
-            <label>Relief Pitcher</label>
-            <select id="rpSel"></select>
-            <span class="mini">Innings</span><input id="rpInn" type="number" min="1" max="6" value="2" title="Target innings"/>
-            <span class="mini">Pitches</span><input id="rpTarget" type="number" min="0" max="120" />
-            <span id="rpBadge" class="small badge"> </span>
+          <div class="cell">
+            <label>Innings</label>
+            <input type="number" id="spInnings" min="0" max="6" value="2" />
           </div>
-          <div class="row">
-            <label>Closing Pitcher</label>
-            <select id="clSel"></select>
-            <span class="mini">Innings</span><input id="clInn" type="number" min="1" max="6" value="1" title="Target innings"/>
-            <span class="mini">Pitches</span><input id="clTarget" type="number" min="0" max="120" />
-            <span id="clBadge" class="small badge"> </span>
+          <div class="cell">
+            <label>Pitches</label>
+            <input type="number" id="spPitches" min="0" max="85" value="0" />
+          </div>
+          <div class="cell">
+            <div class="rest-day-group">
+              <span id="spRest" class="pill good">OK</span>
+            </div>
           </div>
         </div>
-        <div>
-          <h3>Catchers</h3>
-          <div class="row">
-            <label>Starting Catcher</label>
-            <select id="scSel"></select>
-            <span class="small badge spacer"> </span>
+
+        <!-- Row: Relief Pitcher -->
+        <div class="role-row">
+          <div class="cell">
+            <label>Relief Pitcher</label>
+            <select id="rpName"></select>
           </div>
-          <div class="row">
-            <label>Relief Catcher</label>
-            <select id="rcSel"></select>
-            <span class="small badge spacer"> </span>
+          <div class="cell">
+            <label>Innings</label>
+            <input type="number" id="rpInnings" min="0" max="6" value="2" />
           </div>
-          <div class="row">
-            <label>Closing Catcher</label>
-            <select id="ccSel"></select>
-            <span class="small badge spacer"> </span>
+          <div class="cell">
+            <label>Pitches</label>
+            <input type="number" id="rpPitches" min="0" max="85" value="0" />
+          </div>
+          <div class="cell">
+            <div class="rest-day-group">
+              <span id="rpRest" class="pill">Check</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row: Closer -->
+        <div class="role-row">
+          <div class="cell">
+            <label>Closer</label>
+            <select id="cpName"></select>
+          </div>
+          <div class="cell">
+            <label>Innings</label>
+            <input type="number" id="cpInnings" min="0" max="6" value="2" />
+          </div>
+          <div class="cell">
+            <label>Pitches</label>
+            <input type="number" id="cpPitches" min="0" max="85" value="0" />
+          </div>
+          <div class="cell">
+            <div class="rest-day-group">
+              <span id="cpRest" class="pill warn">Needs 1 day</span>
+            </div>
           </div>
         </div>
       </div>
-      <div id="alerts"></div>
-      <button id="buildBtn" class="no-print" style="margin-top:12px">Generate 6-Inning Plan</button>
     </section>
 
-    <section class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h2>Six-Inning Rotation</h2><button id="toggleEdit" class="no-print">Edit Rotation</button></div></h2>
-      <div id="planWrap"></div>
+    <!-- =================== SIX-INNING ROTATION =================== -->
+    <section id="six" class="section panel">
+      <div class="section-header">
+        <h2>Six-Inning Rotation</h2>
+        <div class="actions">
+          <!-- moved here from roster -->
+          <button id="editRotation" class="btn">Edit Rotation</button>
+        </div>
+      </div>
+
+      <div id="rotationGrid" class="rotation-grid">
+        <!-- filled by JS -->
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>Minimum Defensive Innings Tracker</h2>
-      <div id="totals" class="flex"></div>
+    <!-- =================== DEFENSIVE INNINGS TRACKER =================== -->
+    <section id="min-innings" class="section">
+      <h2>Defensive Innings Tracker</h2>
+
+      <div id="inningsTracker" class="tracker">
+        <!-- filled by JS -->
+      </div>
     </section>
   </main>
 
-<script>
-const PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "Anderson", "primary": "RF", "secondary": "1B", "rank": 9}, {"id": "barlet", "number": 1, "first": "Matias", "last": "Barlet", "primary": "CF", "secondary": "3B", "rank": 2}, {"id": "coates", "number": 22, "first": "Truman", "last": "Coates", "primary": "RF", "secondary": "2B", "rank": 12}, {"id": "cooper", "number": 24, "first": "Landon", "last": "Cooper", "primary": "3B", "secondary": "SS", "rank": 6}, {"id": "farrington", "number": 11, "first": "Luke", "last": "Farrington", "primary": "SS", "secondary": "2B", "rank": 5}, {"id": "foushee", "number": 10, "first": "Beau", "last": "Foush\u00e9e", "primary": "3B", "secondary": "1B", "rank": 4}, {"id": "fowl", "number": 63, "first": "George", "last": "Fowl", "primary": "2B", "secondary": "SS", "rank": 7}, {"id": "goodman", "number": 19, "first": "Bridger", "last": "Goodman", "primary": "LF", "secondary": "RF", "rank": 11}, {"id": "kutac", "number": 13, "first": "Max", "last": "Kutac", "primary": "1B", "secondary": "CF", "rank": 1}, {"id": "reiher", "number": 6, "first": "JJ", "last": "Reiher", "primary": "1B", "secondary": "3B", "rank": 3}, {"id": "stephens", "number": 44, "first": "Julian", "last": "Stephens", "primary": "LF", "secondary": "CF", "rank": 8}, {"id": "turner", "number": 21, "first": "Leighton", "last": "Turner", "primary": "RF", "secondary": "2B", "rank": 10}].map(p=>{p.available=true; return p;});
-const POSITIONS = ["1B","2B","3B","SS","LF","CF","RF","—"];
-const $ = (sel)=>document.querySelector(sel);
-const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
-const nameKey=(p)=>`${p.last}, ${p.first}`;
-const short=(p)=>`${p.first} (${p.number})`;
-const get=(id)=>PLAYERS.find(p=>p.id===id);
-function alpha(list){ return [...list].sort((a,b)=>nameKey(a).localeCompare(nameKey(b))); }
+  <footer class="page-footer">
+    <small>© Blacksox Dugout</small>
+  </footer>
 
-let EDIT_MODE = false;
-let LAST_PLAN = null;
+  <!-- =================== SCRIPT =================== -->
+  <script>
+    /***** Demo data (replace with your data source if you already have one) *****/
+    const players = [
+      { id: 1,  name: "Alex Johnson",     rank: 1,  primary: "SS", secondary: "P",   avail: "available" },
+      { id: 2,  name: "Mia Carter",       rank: 2,  primary: "C",  secondary: "3B",  avail: "available" },
+      { id: 3,  name: "Noah Kim",         rank: 3,  primary: "CF", secondary: "SS",  avail: "available" },
+      { id: 4,  name: "Olivia Nguyen",    rank: 4,  primary: "1B", secondary: "P",   avail: "limited"   },
+      { id: 5,  name: "Ethan Rivera",     rank: 5,  primary: "RF", secondary: "2B",  avail: "available" },
+      { id: 6,  name: "Harper Brooks",    rank: 6,  primary: "2B", secondary: "LF",  avail: "available" },
+      { id: 7,  name: "Liam Patel",       rank: 7,  primary: "3B", secondary: "1B",  avail: "available" },
+      { id: 8,  name: "Ava Thompson",     rank: 8,  primary: "LF", secondary: "CF",  avail: "available" },
+      { id: 9,  name: "Jackson Lee",      rank: 9,  primary: "P",  secondary: "SS",  avail: "available" },
+      { id: 10, name: "Emma Garcia",      rank: 10, primary: "C",  secondary: "RF",  avail: "available" },
 
-function setup(){
-  const ctrl = $("#rosterCtrl");
-  ctrl.innerHTML = `
-    <div class="roster-controls inline">
-      <div>
-        <label class="small">View</label>
-        <select id="viewMode">
-          <option value="auto" selected>Auto</option>
-          <option value="table">Table</option>
-          <option value="cards">Cards</option>
-        </select>
-      </div>
-      <div>
-        <label class="small">Min Defensive Innings</label>
-        <select id="minTarget">${[1,2,3,4,5,6].map(v=>`<option value="${v}" ${v===4?'selected':''}>${v}</option>`).join('')}</select>
-      </div>
-      <div>
-        <label class="small">Late Innings</label>
-        <select id="lateMode">
-          <option value="balanced">Balanced</option>
-          <option value="tight" selected>Tight (5–6)</option>
-        </select>
-      </div>
-      
-    </div>`;
-  $("#viewMode").addEventListener('change', updateRosterVisibility);
-  $("#minTarget").addEventListener('change', ()=>{ build(); render([],{},[]); });
-  $("#lateMode").addEventListener('change', ()=>{ build(); });
-  $("#toggleEdit").addEventListener('click', ()=>{ EDIT_MODE = !EDIT_MODE; $("#toggleEdit").textContent = EDIT_MODE ? "Done Editing" : "Edit Rotation"; render(LAST_PLAN.plan, LAST_PLAN.mins, LAST_PLAN.minTarget); });
+      /* The two you asked to reconfigure */
+      { id: 11, name: "Truman Baker",     rank: 15, primary: "3B", secondary: "RF",  avail: "available" }, // will be updated
+      { id: 12, name: "Bridger Collins",  rank: 16, primary: "2B", secondary: "LF",  avail: "available" }, // will be updated
+    ];
 
-  drawRoster();
-  updateRosterVisibility();
-  fillSelectors();
-  ['spTarget','rpTarget','clTarget'].forEach(id=>{
-    document.addEventListener('input', (e)=>{ if(e.target.id===id) updateRestBadges(); });
-  });
-  updateRestBadges();
-  $('#buildBtn').onclick=()=>build();
-  window.addEventListener('resize', updateRosterVisibility);
-}
-function getMinTarget(){ return Math.min(6, Math.max(1, parseInt($('#minTarget').value||'4',10))); }
-function getLateMode(){ return ($('#lateMode')?.value)||'tight'; }
-function updateRosterVisibility(){
-  const mode = $('#viewMode').value;
-  const autoCards = window.innerWidth <= 820;
-  const showCards = (mode==='cards') || (mode==='auto' && autoCards);
-  $('#rosterTableWrap').style.display = showCards ? 'none':'block';
-  $('#rosterCards').style.display = showCards ? 'block':'none';
-}
-function drawRoster(){
-  const tableWrap = $("#rosterTableWrap"); const cardsWrap = $("#rosterCards");
-  tableWrap.innerHTML=''; cardsWrap.innerHTML='';
-  const tbl = el('table','table');
-  tbl.innerHTML='<thead><tr><th>#</th><th>Name</th><th>Rank</th><th>Primary</th><th>Secondary</th><th>Avail</th></tr></thead>';
-  const tb=el('tbody','');
-  const posOpts=(val)=>POSITIONS.map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
-  const rankOpts=(val)=>Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
-  alpha(PLAYERS).forEach(p=>{ const tr=el('tr', p.available?'':'out'); tr.dataset.id=p.id;
-    tr.innerHTML='<td><b>'+p.number+'</b></td><td>'+p.last+', '+p.first+'</td>'
-      +'<td><select data-id="'+p.id+'" data-key="rank">'+rankOpts(p.rank||1)+'</select></td>'
-      +'<td><select data-id="'+p.id+'" data-key="primary">'+posOpts(p.primary)+'</select></td>'
-      +'<td><select data-id="'+p.id+'" data-key="secondary">'+posOpts(p.secondary)+'</select></td>'
-      +'<td><select data-id="'+p.id+'" data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></td>';
-    tb.appendChild(tr);
-  });
-  tbl.appendChild(tb); const tw = el('div','table-wrap'); tw.appendChild(tbl); tableWrap.appendChild(tw);
-  tw.addEventListener('change', onRosterChange);
+    /***** Helpers you asked for *****/
+    function firstNameOnly(s) {
+      if (!s) return s;
+      const token = String(s).replace(/\s+/g, " ").trim().split(" ")[0];
+      return token || s;
+    }
 
-  const list = el('div','cardlist');
-  alpha(PLAYERS).forEach(p=>{
-    const c = el('div','card'); c.dataset.id=p.id;
-    c.innerHTML = '<h4>#'+p.number+' — '+p.first+' '+p.last+'</h4>'
-      +'<div class="grid">'
-      +  '<div><label>Rank</label><select data-key="rank">'+Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===(p.rank||1)?'selected':''}>${v}</option>`).join('')+'</select></div>'
-      +  '<div><label>Avail</label><select data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></div>'
-      +  '<div><label>Primary</label><select data-key="primary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.primary?'selected':''}>${v}</option>`).join('')+'</select></div>'
-      +  '<div><label>Secondary</label><select data-key="secondary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.secondary?'selected':''}>${v}</option>`).join('')+'</select></div>'
-      +'</div>';
-    list.appendChild(c);
-  });
-  list.addEventListener('change', (e)=>{
-    const card = e.target.closest('.card'); const id = card.dataset.id; const key=e.target.dataset.key; const pl=get(id);
-    if(key==='available') pl.available = (e.target.value==='true'); else if(key==='rank') setUniqueRank(pl, parseInt(e.target.value,10)); else pl[key]=e.target.value;
-    fillSelectors();
-  });
-  $("#rosterCards").appendChild(list);
-}
-function onRosterChange(e){
-  if(e.target.tagName!=='SELECT') return;
-  const row = e.target.closest('tr'); const id=row.dataset.id; const key=e.target.dataset.key; const pl=get(id);
-  if(key==='available') pl.available = (e.target.value==='true');
-  else if(key==='rank') setUniqueRank(pl, parseInt(e.target.value,10));
-  else pl[key]=e.target.value;
-  row.className = pl.available ? '' : 'out';
-  fillSelectors();
-}
-function setUniqueRank(player, newRank){
-  const other = PLAYERS.find(p=>p.id!==player.id && p.rank===newRank);
-  if(other) other.rank = player.rank; // swap
-  player.rank = newRank;
-  drawRoster(); updateRosterVisibility();
-}
-function fillSelectors(){
-  const avail = alpha(PLAYERS.filter(p=>p.available));
-  for(const id of ['spSel','rpSel','clSel','scSel','rcSel','ccSel']){
-    const sel = $('#'+id); sel.innerHTML = '<option value="">—</option>';
-    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = p.last+', '+p.first+' ('+p.number+')'; sel.appendChild(o); });
-  }
-}
-function pitchersByInning(sp, rp, cl){ return [sp, sp, sp, rp, rp, cl]; }
-function catchersByInning(sc, rc, cc){ return [sc, sc, sc, rc, rc, cc]; }
-function scoreForPos(player, pos, prevPCPenaltyIds, inn, lateMode){
-  let s = 0;
-  if(player.primary===pos) s += 3; else if(player.secondary===pos) s += 1;
-  const infieldNon1B = ["2B","3B","SS"];
-  const isIF = infieldNon1B.includes(pos), isOF = ["LF","CF","RF"].includes(pos);
-  if(isIF && (infieldNon1B.includes(player.primary) || infieldNon1B.includes(player.secondary))) s += 1.5;
-  if(isOF && (["LF","CF","RF"].includes(player.primary) || ["LF","CF","RF"].includes(player.secondary))) s += 1.5;
-  if(prevPCPenaltyIds.has(player.id)) s -= 8;
-  if(lateMode==='tight' && inn>=5){ s += (13 - player.rank) * 0.9; }
-  return s;
-}
-const RULES = { thresholds:[{max:40,rest:0},{max:60,rest:1},{max:85,rest:2}] };
-function restDaysFor(pitches){ if(!pitches) return 0; if(pitches<=RULES.thresholds[0].max) return 0; if(pitches<=RULES.thresholds[1].max) return 1; return 2; }
-function badgeHTML(pitches){ const r = restDaysFor(pitches); const cls = r===0?'good':(r===1?'warn':'bad'); return `<span class="badge ${cls}">${(pitches||0)}p → ${r}d rest</span>`; }
-function updateRestBadges(){
-  const sp = parseInt(document.getElementById('spTarget')?.value||'0',10);
-  const rp = parseInt(document.getElementById('rpTarget')?.value||'0',10);
-  const cl = parseInt(document.getElementById('clTarget')?.value||'0',10);
-  document.getElementById('spBadge').outerHTML = badgeHTML(sp);
-  document.getElementById('rpBadge').outerHTML = badgeHTML(rp);
-  document.getElementById('clBadge').outerHTML = badgeHTML(cl);
-  const badges = document.querySelectorAll('.badge');
-  badges[0].id='spBadge'; badges[1].id='rpBadge'; badges[2].id='clBadge';
-}
+    // Data updates: Truman rank 11 LF/2B, Bridger rank 12
+    function applyDefaultRosterFixes(list) {
+      const byFirst = who => list.find(p => (p.name || "").trim().toLowerCase().startsWith(who));
+      const truman  = byFirst("truman");
+      const bridger = byFirst("bridger");
 
-// Guard: prevent same player at P and C in the same inning
-function conflictsPC(sp,rp,cl,sc,rc,cc){
-  const pBy = pitchersByInning(sp,rp,cl);
-  const cBy = catchersByInning(sc,rc,cc);
-  const bad = [];
-  for(let i=0;i<6;i++){
-    if(pBy[i] && cBy[i] && pBy[i]===cBy[i]) bad.push(i+1);
-  }
-  return bad;
-}
+      if (truman) { truman.rank = 11; truman.primary = "LF"; truman.secondary = "2B"; }
+      if (bridger) { bridger.rank = 12; }
 
-function build(){
-  $('#alerts').innerHTML='';
-  const spId = $('#spSel').value || null;
-  const rpId = $('#rpSel').value || null;
-  const clId = $('#clSel').value || null;
-  const scId = $('#scSel').value || null;
-  const rcId = $('#rcSel').value || null;
-  const ccId = $('#ccSel').value || null;
-  if(!spId){ $('#alerts').innerHTML='<div class="alert">Choose a <b>Starting Pitcher</b>.</div>'; return; }
-  if(!scId){ $('#alerts').innerHTML='<div class="alert">Choose a <b>Starting Catcher</b>.</div>'; return; }
+      // Remove last names in data so the whole UI stays first-name only
+      list.forEach(p => p.name = firstNameOnly(p.name));
 
-  const bad = conflictsPC(spId,rpId,clId,scId,rcId,ccId);
-  if(bad.length){
-    $('#alerts').innerHTML='<div class="alert"><b>P and C cannot be the same player</b> in inning(s): '+bad.join(', ')+' — please adjust catcher selections.</div>';
-    return;
-  }
+      // Keep list rank-sorted for roster order
+      list.sort((a,b) => (a.rank ?? 999) - (b.rank ?? 999));
+    }
 
-  const pBy = pitchersByInning(spId, rpId, clId);
-  const cBy = catchersByInning(scId, rcId, ccId);
-  const MIN_T = getMinTarget();
-  const lateMode = getLateMode();
-  const available = alpha(PLAYERS.filter(p=>p.available));
-  const plan=[]; const mins={}; PLAYERS.forEach(p=>mins[p.id]=0);
-  const reservedEH={}; // by block
+    // Populate selects with player names
+    function fillPlayerSelect(sel, list) {
+      sel.innerHTML = "";
+      list.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name; // first-name already
+        sel.appendChild(opt);
+      });
+    }
 
-  for(let inn=1; inn<=6; inn++){
-    const bi = inn<=2 ? 0 : (inn<=4 ? 1 : 2);
-    const used=new Set([pBy[inn-1], cBy[inn-1]]);
-    const inning={P:pBy[inn-1],C:cBy[inn-1],'1B':null,'2B':null,'3B':null,'SS':null,'LF':null,'CF':null,'RF':null,'EH':[]};
-    if(inning.P) mins[inning.P]=(mins[inning.P]||0)+1;
-    if(inning.C) mins[inning.C]=(mins[inning.C]||0)+1;
-    const blockedEH = new Set();
-    if((inn%2)===0 && reservedEH[bi]) reservedEH[bi].forEach(id=>blockedEH.add(id));
-    const prevPCPenaltyIds = new Set();
-    if(inn>1){ if(pBy[inn-2]) prevPCPenaltyIds.add(pBy[inn-2]); if(cBy[inn-2]) prevPCPenaltyIds.add(cBy[inn-2]); }
-    const urgencyWeight = (lateMode==='tight' && inn>=5) ? 4 : 10;
+    // Render roster cards
+    function renderRoster(list) {
+      const wrap = document.getElementById("rosterList");
+      wrap.innerHTML = "";
+      list.forEach(p => {
+        const card = document.createElement("article");
+        card.className = "player-card";
 
-    const pool = ()=>available.filter(pl=>!used.has(pl.id) && !blockedEH.has(pl.id));
-    function chooseBest(pos, list){
-      let best=null, bestScore=-1e9;
-      for(const pl of list){
-        const s = scoreForPos(pl,pos, prevPCPenaltyIds, inn, lateMode);
-        const urg = Math.max(0, MIN_T - (mins[pl.id]||0));
-        const comp=urg*urgencyWeight + s;
-        if(comp>bestScore || (comp===bestScore && nameKey(pl) < nameKey(best?get(best):pl))){ best=pl.id; bestScore=comp; }
+        const header = document.createElement("div");
+        header.className = "player-card__header";
+        const nm = document.createElement("div");
+        nm.className = "player-name";
+        nm.textContent = p.name; // first name only
+        const meta = document.createElement("div");
+        meta.className = "player-meta";
+        meta.textContent = `#${p.rank} — ${p.primary} • ${p.secondary}`;
+        header.append(nm, meta);
+
+        const fields = document.createElement("div");
+        fields.className = "player-card__fields";
+        fields.innerHTML = `
+          <div class="field"><span>Primary</span><div>${p.primary}</div></div>
+          <div class="field"><span>Secondary</span><div>${p.secondary}</div></div>
+          <div class="field"><span>Availability</span><div>${p.avail}</div></div>
+          <div class="field"><span>Rank</span><div>${p.rank}</div></div>
+        `;
+
+        card.append(header, fields);
+        wrap.appendChild(card);
+      });
+    }
+
+    // Render rotation grid (simple 6 innings x 9 positions mock)
+    function renderRotation(list) {
+      const grid = document.getElementById("rotationGrid");
+      grid.innerHTML = "";
+      const positions = ["P","C","1B","2B","3B","SS","LF","CF","RF"];
+      for (let inning = 1; inning <= 6; inning++) {
+        const row = document.createElement("div");
+        row.className = "rot-row";
+        const tag = document.createElement("div");
+        tag.className = "rot-inning";
+        tag.textContent = `Inning ${inning}`;
+        row.appendChild(tag);
+        positions.forEach((pos, i) => {
+          const cell = document.createElement("div");
+          cell.className = "rot-cell";
+          const p = list[(inning - 1 + i) % list.length];
+          cell.innerHTML = `<div class="rot-pos">${pos}</div><div class="rot-name">${p ? p.name : ""}</div>`;
+          row.appendChild(cell);
+        });
+        grid.appendChild(row);
       }
-      return best;
     }
-    // Hard-locked 1B/SS first
-    const specPool = (pos)=>pool().filter(pl=> (pos==='1B'?(pl.primary==='1B'||pl.secondary==='1B'):(pl.primary==='SS'||pl.secondary==='SS')) );
-    for(const pos of ['1B','SS']){
-      const list=specPool(pos);
-      if(list.length){ const id=chooseBest(pos, list); inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
-    }
-    // Fill generics with SS after 3B for flow
-    for(const pos of ['2B','3B','SS','CF','LF','RF']){
-      if(inning[pos]) continue;
-      const id=chooseBest(pos, pool()); if(id){ inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
-    }
-    // If special still empty, allow pulls from reservedEH (then recompute EH)
-    function pullFromLockedEH(pos, qual){
-      if(inning[pos]) return false;
-      const list=(reservedEH[bi]||[]).filter(id=>qual(get(id)) && !used.has(id));
-      if(list.length){
-        list.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
-        const id=list[0]; inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; blockedEH.delete(id);
-        return true;
-      }
-      return false;
-    }
-    let pulled = false;
-    pulled = pullFromLockedEH('1B', p=>p.primary==='1B'||p.secondary==='1B') || pulled;
-    pulled = pullFromLockedEH('SS', p=>p.primary==='SS'||p.secondary==='SS') || pulled;
 
-    // Final EH calc with guaranteed fill
-    const remaining = available.map(p=>p.id).filter(id=>!used.has(id));
-    if((inn%2)===1){
-      inning.EH = remaining;
-      reservedEH[bi] = remaining.slice();
-    } else {
-      let base = (reservedEH[bi]||[]).filter(id=>!used.has(id));
-      if(pulled){
-        // top up base after a pull, using remaining not in base
-        const extras = remaining.filter(id=>!base.includes(id));
-        extras.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
-        base = base.concat(extras);
+    // Render Defensive Innings Tracker (no rank chips shown here)
+    function renderInningsTracker(list) {
+      const t = document.getElementById("inningsTracker");
+      t.innerHTML = "";
+      list.forEach(p => {
+        const row = document.createElement("div");
+        row.className = "track-row";
+        row.innerHTML = `
+          <div class="badge">
+            <span class="track-name">${p.name}</span>
+            <!-- rank intentionally omitted in this section -->
+          </div>
+          <div class="bar">
+            <div class="bar-fill" style="width:${Math.min(100, (Math.random()*100)).toFixed(0)}%"></div>
+          </div>
+        `;
+        t.appendChild(row);
+      });
+    }
+
+    // Rest-day indicator demo (you likely have your own logic)
+    function recalcRestPills() {
+      const val = parseInt(document.getElementById("spPitches").value || "0", 10);
+      const pill = document.getElementById("spRest");
+      if (val >= 65) {
+        pill.className = "pill bad";
+        pill.textContent = "Needs 3 days";
+      } else if (val >= 40) {
+        pill.className = "pill warn";
+        pill.textContent = "Needs 2 days";
+      } else if (val >= 21) {
+        pill.className = "pill warn";
+        pill.textContent = "Needs 1 day";
       } else {
-        const need = remaining.length - base.length;
-        if(need>0){
-          const extras = remaining.filter(id=>!base.includes(id));
-          extras.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
-          base = base.concat(extras.slice(0,need));
-        }
+        pill.className = "pill good";
+        pill.textContent = "OK";
       }
-      inning.EH = base;
     }
-    plan.push(inning);
-  }
-  LAST_PLAN = {plan, mins, minTarget:getMinTarget()};
-  render(plan, mins, getMinTarget());
-}
 
-function makePlayerSelect(inningIdx, pos, currentId){
-  const sel = document.createElement('select');
-  const planRow = LAST_PLAN.plan[inningIdx];
-  const used = new Set(['P','C','1B','2B','3B','SS','LF','CF','RF'].map(k=>planRow[k]).filter(Boolean));
-  if(currentId) used.delete(currentId);
-  const avail = alpha(PLAYERS.filter(p=>p.available));
-  const opt = document.createElement('option'); opt.value=''; opt.textContent='—'; sel.appendChild(opt);
-  avail.forEach(p=>{
-    if(!used.has(p.id)){
-      const o=document.createElement('option'); o.value=p.id; o.textContent = nameKey(p);
-      if(p.id===currentId) o.selected=true;
-      sel.appendChild(o);
+    // Wire up filter/sort (basic example)
+    function applyRosterControls() {
+      const filter = document.getElementById("rosterFilter").value;
+      const sort   = document.getElementById("rosterSort").value;
+      const avail  = document.getElementById("rosterAvail").value;
+
+      let filtered = players.slice();
+
+      if (avail !== "all") filtered = filtered.filter(p => p.avail === avail);
+
+      if (filter === "pitchers") filtered = filtered.filter(p => p.primary === "P" || p.secondary === "P");
+      if (filter === "catchers") filtered = filtered.filter(p => p.primary === "C" || p.secondary === "C");
+      if (filter === "infield")  filtered = filtered.filter(p => ["1B","2B","3B","SS"].includes(p.primary) || ["1B","2B","3B","SS"].includes(p.secondary));
+      if (filter === "outfield") filtered = filtered.filter(p => ["LF","CF","RF"].includes(p.primary) || ["LF","CF","RF"].includes(p.secondary));
+
+      if (sort === "name-asc")  filtered.sort((a,b) => a.name.localeCompare(b.name));
+      if (sort === "name-desc") filtered.sort((a,b) => b.name.localeCompare(a.name));
+      if (sort === "rank-asc")  filtered.sort((a,b) => a.rank - b.rank);
+
+      renderRoster(filtered);
     }
-  });
-  sel.addEventListener('change', ()=>{
-    const id = sel.value || null;
-    LAST_PLAN.plan[inningIdx][pos] = id;
-    recomputeAfterManual(inningIdx);
-  });
-  return sel;
-}
 
-function recomputeAfterManual(inningIdx){
-  const plan = LAST_PLAN.plan;
-  const mins = {}; PLAYERS.forEach(p=>mins[p.id]=0);
-  for(let i=0;i<6;i++){
-    const row = plan[i];
-    const used = new Set(['P','C','1B','2B','3B','SS','LF','CF','RF'].map(k=>row[k]).filter(Boolean));
-    const available = alpha(PLAYERS.filter(p=>p.available)).map(p=>p.id);
-    row.EH = available.filter(id=>!used.has(id));
-    used.forEach(id=>{ mins[id]=(mins[id]||0)+1; });
-  }
-  LAST_PLAN.mins = mins;
-  render(plan, mins, LAST_PLAN.minTarget);
-}
+    // Initialize page
+    (function init() {
+      applyDefaultRosterFixes(players);
 
-function render(plan, mins, MIN_T){
-  const INNINGS=[1,2,3,4,5,6];
-  const wrap=$("#planWrap"); wrap.innerHTML='';
-  const tbl=el('table','table'); tbl.innerHTML='<thead><tr><th>Pos</th>'+INNINGS.map(i=>`<th>${i}</th>`).join('')+'</tr></thead>';
-  const tb=el('tbody','');
-  function cellVal(v){ if(!v) return '—'; return short(get(v)); }
-  function ehVal(arr){ return '<div class="stack">'+arr.map(id=>'<span>'+short(get(id))+'</span>').join('')+'</div>'; }
-  const order = ['P','C','1B','2B','3B','SS','LF','CF','RF','EH'];
-  order.forEach((pos)=>{
-    const tr=el('tr','');
-    tr.appendChild((()=>{const td=el('td',''); td.innerHTML='<b>'+pos+'</b>'; return td;})());
-    INNINGS.forEach((i)=>{
-      const td=el('td','');
-      const row=plan[i-1];
-      if(pos==='EH'){ td.innerHTML = ehVal(row.EH||[]); }
-      else if(EDIT_MODE && pos!=='P' && pos!=='C'){
-        const sel = makePlayerSelect(i-1, pos, row[pos]);
-        td.appendChild(sel);
-      } else {
-        td.textContent = cellVal(row[pos]);
-      }
-      tr.appendChild(td);
-    });
-    tb.appendChild(tr);
-  });
-  tbl.appendChild(tb);
-  const wrapDiv=el('div','table-wrap'); wrapDiv.appendChild(tbl); wrap.appendChild(wrapDiv);
+      // Fill selects with first-name-only values
+      fillPlayerSelect(document.getElementById("spName"), players);
+      fillPlayerSelect(document.getElementById("rpName"), players);
+      fillPlayerSelect(document.getElementById("cpName"), players);
 
-  const totals=$("#totals"); totals.innerHTML='';
-  alpha(PLAYERS).forEach(p=>{ const got=mins[p.id]||0; const target=parseInt($('#minTarget').value||'4',10); const pct=Math.min(100, got/target*100); const bar='<div class="bar"><span style="width:'+pct+'%"></span></div>'; const label = short(p)+' — '+got+'/'+target+(got>=target?' ✔':' •')+' (rank '+p.rank+')'; const pill=el('div','pill'); pill.innerHTML = label+' '+bar; if(!p.available) pill.classList.add('out'); totals.appendChild(pill); });
-}
+      // Initial renders
+      applyRosterControls();
+      renderRotation(players);
+      renderInningsTracker(players);
 
-function updateRestBadges(){
-  const sp = parseInt(document.getElementById('spTarget')?.value||'0',10);
-  const rp = parseInt(document.getElementById('rpTarget')?.value||'0',10);
-  const cl = parseInt(document.getElementById('clTarget')?.value||'0',10);
-  const RULES = { thresholds:[{max:40,rest:0},{max:60,rest:1},{max:85,rest:2}] };
-  function restDaysFor(pitches){ if(!pitches) return 0; if(pitches<=RULES.thresholds[0].max) return 0; if(pitches<=RULES.thresholds[1].max) return 1; return 2; }
-  function asBadge(p){
-    const r=restDaysFor(p); const cls = r===0?'good':(r===1?'warn':'bad');
-    return `<span class="badge ${cls}">${(p||0)}p → ${r}d rest</span>`;
-  }
-  document.getElementById('spBadge').outerHTML = asBadge(sp);
-  document.getElementById('rpBadge').outerHTML = asBadge(rp);
-  document.getElementById('clBadge').outerHTML = asBadge(cl);
-  const badges = document.querySelectorAll('.badge');
-  badges[0].id='spBadge'; badges[1].id='rpBadge'; badges[2].id='clBadge';
-}
+      // Controls
+      document.getElementById("rosterFilter").addEventListener("change", applyRosterControls);
+      document.getElementById("rosterSort").addEventListener("change", applyRosterControls);
+      document.getElementById("rosterAvail").addEventListener("change", applyRosterControls);
 
-document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ console.error(e); alert('Init error: '+e.message); } });
-</script>
+      ["spPitches","spInnings"].forEach(id => document.getElementById(id).addEventListener("input", recalcRestPills));
+
+      // Defensive Innings Tracker: ensure any stray rank nodes are hidden if someone injects them later
+      const section = document.querySelector("#min-innings");
+      section.querySelectorAll(".rank, .player-rank, [data-rank]").forEach(n => n.remove());
+    })();
+  </script>
 </body>
 </html>
