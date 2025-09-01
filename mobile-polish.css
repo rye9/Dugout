@@ -1,6 +1,6 @@
 /* --- Mobile polish for iOS Safari --- */
 :root {
-  --gap-xxs: 6px; --gap-xs: 10px; --gap-s: 12px; --gap-m: 16px; --gap-l: 20px;
+  --gap-xxs: 6px; --gap-xs: 10px; --gap-s: 12px; --gap-m: 16px; --gap-l: 20px; --gap-xl: 26px;
   --radius: 10px; --card: rgba(255,255,255,0.06); --card-b: rgba(255,255,255,0.10);
   --muted: rgba(255,255,255,0.65);
 }
@@ -28,6 +28,25 @@ section, .section {
 }
 
 /* ---------- ROSTER ---------- */
+/* Settings area before players */
+.roster-controls{
+  padding: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-b);
+  border-radius: 12px;
+  margin-bottom: var(--gap-m);
+  gap: 12px; /* keeps your flex layout neat */
+}
+.roster-controls::before{
+  content: "Settings";
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--muted);
+  letter-spacing: .2px;
+}
+
+/* Player cards */
 .card, .player-card {
   margin-bottom: var(--gap-m);
   padding: var(--gap-m);
@@ -36,7 +55,7 @@ section, .section {
   border-radius: var(--radius);
 }
 
-/* Within each player card, make fields a tidy 2-col grid on phones */
+/* Player fields grid */
 .card .grid, .player-card__fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -53,12 +72,28 @@ section, .section {
   gap: var(--gap-m);
 }
 
+/* Role rows (Starting / Relief / Closing) */
 .role-row {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto auto auto;
   gap: var(--gap-s);
   align-items: end;
+  padding-top: 10px;               /* extra breathing room */
 }
+.role-row + .role-row{
+  margin-top: 18px;                /* space between groups */
+  padding-top: 14px;
+  border-top: 1px dashed var(--card-b);
+}
+
+/* Make the role titles stand out (first label in each row) */
+.role-row .cell:first-child label{
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .2px;
+  color: #e7edf6;
+}
+
 .role-row .cell { display: grid; gap: var(--gap-xxs); }
 input[type="number"] { text-align: center; min-width: 54px; }
 
@@ -84,24 +119,19 @@ button, .btn {
 
 /* ---------- MOBILE (phones) ---------- */
 @media (max-width: 720px) {
-  /* roster stays 2-col */
-  .card .grid, .player-card__fields {
-    grid-template-columns: 1fr 1fr;
-  }
+  /* Roster stays 2-col */
+  .card .grid, .player-card__fields { grid-template-columns: 1fr 1fr; }
 
-  /* pitchers & catchers stack vertically */
-  .role-row {
-    grid-template-columns: 1fr !important;
-  }
-  .role-row > .cell {
-    margin-bottom: 12px;
-  }
+  /* Pitchers & Catchers stack vertically */
+  .role-row { grid-template-columns: 1fr !important; }
+  .role-row > .cell { margin-bottom: 12px; }
+  .role-row + .role-row { margin-top: 22px; padding-top: 18px; } /* a bit more space on phones */
 
-  .setup-block {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
+  .setup-block { display: flex; flex-direction: column; gap: 18px; }
+
+  /* Minimum Defensive Innings Tracker: single column list
+     (assumes the list right after the panel's H2 uses .flex) */
+  .panel h2 + .flex { flex-direction: column; gap: 12px; }
 }
 
 /* ---------- DESKTOP (wider) ---------- */
