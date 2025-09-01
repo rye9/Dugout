@@ -1,0 +1,90 @@
+/* --- Mobile polish for iOS Safari --- */
+:root{
+  --gap-xxs: 6px; --gap-xs: 10px; --gap-s: 12px; --gap-m: 16px; --gap-l: 20px;
+  --radius: 10px; --card: rgba(255,255,255,0.06); --card-b: rgba(255,255,255,0.10);
+  --muted: rgba(255,255,255,0.65);
+}
+html{-webkit-text-size-adjust:100%}
+select,input[type="text"],input[type="number"]{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--card-b);
+  background:rgba(255,255,255,0.04); color:inherit; -webkit-appearance:none;
+}
+label{font-size:12px;color:var(--muted)}
+
+/* Section containers (works whether you use .section or plain divs) */
+h2{margin:0 0 var(--gap-s)}
+h3{margin:var(--gap-m) 0 var(--gap-s)}
+section, .section{margin:var(--gap-l) 0; padding:var(--gap-m); background:var(--card); border:1px solid var(--card-b); border-radius:var(--radius)}
+/* If your page doesn't wrap sections, this keeps it harmless */
+
+/* ---------- ROSTER ---------- */
+/* Each immediate child under the Roster heading becomes a "card" */
+h2:matches(:is(:where(*))){} /* noop for compatibility */
+h2 + *{margin-top:var(--gap-s)}
+/* Try to detect the roster block */
+h2:where(:is(*)):has(.-not-a-real-selector){} /* keep parser happy */
+h2:contains("Roster"){}
+/* Fallback: any element directly after a Roster H2 gets nicer card styling for its children */
+h2 + .roster, h2 + div, h2 + section{
+  /* card spacing inside roster list */
+}
+h2 + .roster > *,       /* if you use a .roster container */
+h2 + div > .player,     /* if you already use .player cards */
+h2 + div > *            /* generic fallback */
+{
+  margin-bottom: var(--gap-m);
+  padding: var(--gap-m);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--card-b);
+  border-radius: var(--radius);
+}
+
+/* Within each player block, arrange fields in a tidy 2-col grid on phones */
+h2 + .roster > * .field-row,
+h2 + div > * .field-row,
+h2 + div > * .fields,
+h2 + div > * {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-s) var(--gap-m);
+}
+h2 + .roster > * .field,
+h2 + div > * .field{
+  display:grid; gap:var(--gap-xxs);
+}
+
+/* If you don’t have .field wrappers, this still evens out selects + inputs */
+h2 + div > * select, 
+h2 + div > * input[type="text"], 
+h2 + div > * input[type="number"]{ min-height:40px }
+
+/* ---------- GAME SETUP: Pitchers / Catchers ---------- */
+/* Align role rows: [role select] [innings] [pitches] [rest pill (optional)] */
+h3:contains("Pitchers") + *,
+h3:contains("Catchers") + *{
+  display: grid; gap: var(--gap-m);
+}
+h3:contains("Pitchers") + * > *,
+h3:contains("Catchers") + * > *{
+  display:grid; grid-template-columns:minmax(0,1fr) auto auto auto; gap:var(--gap-s); align-items:end;
+}
+h3:contains("Pitchers") + * label,
+h3:contains("Catchers") + * label{font-size:12px;color:var(--muted)}
+input[type="number"]{ text-align:center; min-width:54px }
+
+.pill{ padding:8px 10px; border-radius:999px; font-size:12px; line-height:1;
+  border:1px solid var(--card-b); background:rgba(255,255,255,0.05); text-align:center; white-space:nowrap }
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 720px){
+  h2 + .roster > * .field-row,
+  h2 + div > * .field-row,
+  h2 + div > * .fields,
+  h2 + div > *{
+    grid-template-columns: repeat(4, minmax(0,1fr));
+  }
+  h3:contains("Pitchers") + * > *,
+  h3:contains("Catchers") + * > *{
+    grid-template-columns:minmax(280px,2fr) 110px 110px auto;
+  }
+}
