@@ -1,79 +1,480 @@
-<!-- ROSTER -->
-<section id="roster" class="section">
-  <h2>Roster</h2>
-
-  <!-- NEW: clear Settings block before details -->
-  <div class="roster-controls">
-    <!-- (your three controls go here; they will stack vertically) -->
-    <label class="field">
-      <span>Filter</span>
-      <select id="rosterFilter">...</select>
-    </label>
-    <label class="field">
-      <span>Sort</span>
-      <select id="rosterSort">...</select>
-    </label>
-    <label class="field">
-      <span>Availability</span>
-      <select id="rosterAvail">...</select>
-    </label>
-  </div>
-
-  <!-- Player details remain two columns on desktop -->
-  <div class="player-card">
-    <div class="player-card__fields">
-      <!-- .field items -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Blacksox Dugout — Single Game Builder (v1.0)</title>
+  <style>
+:root{--bg:#0b1220;--panel:#111a2b;--text:#e7edf6;--muted:#9bb0c9;--accent:#69a6ff;--grid:#2a3a55;
+      --good:#22c55e; --warn:#facc15; --bad:#fb923c}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--grid);position:sticky;top:0;background:var(--bg);z-index:10}
+h1{font-size:16px;margin:0}.actions button{background:var(--panel);color:var(--text);border:1px solid var(--grid);padding:8px 10px;margin-left:8px;border-radius:6px;cursor:pointer}
+.actions button:hover{border-color:var(--accent);color:#fff}
+main{padding:10px;max-width:1200px;margin:0 auto}
+.panel{background:var(--panel);border:1px solid var(--grid);border-radius:12px;padding:12px;margin-bottom:12px}
+.table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid var(--grid);background:#0e1627}
+.table{width:100%;min-width:760px;border-collapse:collapse;font-size:14px}
+.table th,.table td{border-bottom:1px solid var(--grid);padding:8px;text-align:center;vertical-align:top;white-space:nowrap}
+.table th{position:sticky;top:0;background:#10223a;z-index:1}
+select,input{background:#0e1627;color:var(--text);border:1px solid var(--grid);padding:8px 10px;border-radius:8px;font-size:16px}
+input[type=number]{width:64px}
+.pill{padding:4px 8px;border:1px solid var(--grid);border-radius:999px;background:#0e1627;display:inline-block;margin:2px}
+.bar{height:8px;background:#0e1627;border-radius:8px;overflow:hidden}
+.bar>span{display:block;height:8px;background:var(--good)}
+.flex{display:flex;gap:12px;flex-wrap:wrap}
+.twocol{display:grid;grid-template-columns:2fr 1.2fr;gap:18px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;min-height:44px} .mini{font-size:12px;color:var(--muted);min-width:auto}
+.row label{min-width:132px}
+.stack{display:flex;flex-direction:column;gap:2px;align-items:center}
+.out{opacity:0.5}
+.alert{padding:8px 10px;border:1px solid var(--warn);background:#1a1420;border-radius:8px;margin-bottom:8px}
+.badge{display:inline-block;padding:2px 6px;border-radius:999px;border:1px solid var(--grid);margin-left:6px;min-width:auto;text-align:center;white-space:nowrap;font-size:12px;line-height:1.25}
+.badge.good{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.4)}
+.badge.warn{background:rgba(250,204,21,0.12);border-color:rgba(250,204,21,0.4)}
+.badge.bad{background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.4)}
+.badge.spacer{opacity:0}
+.cardlist{display:block}.card{border:1px solid var(--grid);background:#0e1627;border-radius:10px;padding:10px;margin-bottom:8px}
+.card h4{margin:0 0 8px 0;font-size:15px}.card .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.card label{font-size:12px;color:var(--muted)}
+.roster-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.no-print{}
+.print-only{display:none}
+@media (max-width:820px){ .twocol{grid-template-columns:1fr} .row{flex-wrap:wrap} .row label{min-width:auto} }
+@media print{
+  header,.no-print,.print-hide{display:none !important}
+  .print-only{display:block}
+}
+  </style>
+</head>
+<body>
+  <header class="no-print">
+    <h1>Blacksox Dugout — Single Game Builder (v1.0)</h1>
+    <div class="actions">
+      <button onclick="window.print()">Print</button>
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- GAME SETUP -->
-<section id="game-setup" class="section">
-  <h2>Game Setup</h2>
+  <main>
+    <section class="panel print-hide">
+      <h2>Roster</h2>
+      <div id="rosterCtrl"></div>
+      <div id="rosterTableWrap"></div>
+      <div id="rosterCards"></div>
+    </section>
 
-  <div class="setup-block">
-    <!-- Pitchers row -->
-    <div class="role-row">
-      <div class="cell">
-        <label>Starting Pitcher</label>
-        <input type="text" id="spName" />
-      </div>
-      <div class="cell">
-        <label>Innings</label>
-        <input type="number" id="spInnings" />
-      </div>
-      <div class="cell">
-        <label>Pitches</label>
-        <input type="number" id="spPitches" />
-      </div>
-      <div class="cell">
-        <!-- NEW: group around rest-day pills -->
-        <div class="rest-day-group">
-          <span class="pill rest-day">OK</span>
-          <!-- or -->
-          <!-- <span class="pill rest-day warn">Needs 1 day</span> -->
+    <section class="panel">
+      <h2>Game Setup</h2>
+      <div class="twocol">
+        <div>
+          <h3>Pitchers</h3>
+          <div class="row">
+            <label>Starting Pitcher</label>
+            <select id="spSel"></select>
+            <span class="mini">Innings</span><input id="spInn" type="number" min="1" max="6" value="3" title="Target innings"/>
+            <span class="mini">Pitches</span><input id="spTarget" type="number" min="0" max="120" />
+            <span id="spBadge" class="small badge"> </span>
+          </div>
+          <div class="row">
+            <label>Relief Pitcher</label>
+            <select id="rpSel"></select>
+            <span class="mini">Innings</span><input id="rpInn" type="number" min="1" max="6" value="2" title="Target innings"/>
+            <span class="mini">Pitches</span><input id="rpTarget" type="number" min="0" max="120" />
+            <span id="rpBadge" class="small badge"> </span>
+          </div>
+          <div class="row">
+            <label>Closing Pitcher</label>
+            <select id="clSel"></select>
+            <span class="mini">Innings</span><input id="clInn" type="number" min="1" max="6" value="1" title="Target innings"/>
+            <span class="mini">Pitches</span><input id="clTarget" type="number" min="0" max="120" />
+            <span id="clBadge" class="small badge"> </span>
+          </div>
+        </div>
+        <div>
+          <h3>Catchers</h3>
+          <div class="row">
+            <label>Starting Catcher</label>
+            <select id="scSel"></select>
+            <span class="small badge spacer"> </span>
+          </div>
+          <div class="row">
+            <label>Relief Catcher</label>
+            <select id="rcSel"></select>
+            <span class="small badge spacer"> </span>
+          </div>
+          <div class="row">
+            <label>Closing Catcher</label>
+            <select id="ccSel"></select>
+            <span class="small badge spacer"> </span>
+          </div>
         </div>
       </div>
-    </div>
+      <div id="alerts"></div>
+      <button id="buildBtn" class="no-print" style="margin-top:12px">Generate 6-Inning Plan</button>
+    </section>
 
-    <!-- Repeat .role-row for RP/CP, catchers, etc. -->
-  </div>
-</section>
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h2>Six-Inning Rotation</h2><button id="toggleEdit" class="no-print">Edit Rotation</button></div></h2>
+      <div id="planWrap"></div>
+    </section>
 
-<!-- SIX-INNING ROTATION -->
-<section id="six" class="section panel">
-  <h2>Six-Inning Rotation</h2>
+    <section class="panel">
+      <h2>Minimum Defensive Innings Tracker</h2>
+      <div id="totals" class="flex"></div>
+    </section>
+  </main>
 
-  <!-- MOVED HERE: Edit button lives in the correct section -->
-  <div class="flex gap">
-    <button id="editRotation" class="btn">Edit Rotation</button>
-  </div>
+<script>
+const PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "Anderson", "primary": "RF", "secondary": "1B", "rank": 9}, {"id": "barlet", "number": 1, "first": "Matias", "last": "Barlet", "primary": "CF", "secondary": "3B", "rank": 2}, {"id": "coates", "number": 22, "first": "Truman", "last": "Coates", "primary": "RF", "secondary": "2B", "rank": 12}, {"id": "cooper", "number": 24, "first": "Landon", "last": "Cooper", "primary": "3B", "secondary": "SS", "rank": 6}, {"id": "farrington", "number": 11, "first": "Luke", "last": "Farrington", "primary": "SS", "secondary": "2B", "rank": 5}, {"id": "foushee", "number": 10, "first": "Beau", "last": "Foush\u00e9e", "primary": "3B", "secondary": "1B", "rank": 4}, {"id": "fowl", "number": 63, "first": "George", "last": "Fowl", "primary": "2B", "secondary": "SS", "rank": 7}, {"id": "goodman", "number": 19, "first": "Bridger", "last": "Goodman", "primary": "LF", "secondary": "RF", "rank": 11}, {"id": "kutac", "number": 13, "first": "Max", "last": "Kutac", "primary": "1B", "secondary": "CF", "rank": 1}, {"id": "reiher", "number": 6, "first": "JJ", "last": "Reiher", "primary": "1B", "secondary": "3B", "rank": 3}, {"id": "stephens", "number": 44, "first": "Julian", "last": "Stephens", "primary": "LF", "secondary": "CF", "rank": 8}, {"id": "turner", "number": 21, "first": "Leighton", "last": "Turner", "primary": "RF", "secondary": "2B", "rank": 10}].map(p=>{p.available=true; return p;});
+const POSITIONS = ["1B","2B","3B","SS","LF","CF","RF","—"];
+const $ = (sel)=>document.querySelector(sel);
+const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
+const nameKey=(p)=>`${p.last}, ${p.first}`;
+const short=(p)=>`${p.first} (${p.number})`;
+const get=(id)=>PLAYERS.find(p=>p.id===id);
+function alpha(list){ return [...list].sort((a,b)=>nameKey(a).localeCompare(nameKey(b))); }
 
-  <!-- rotation table/cards... -->
-</section>
+let EDIT_MODE = false;
+let LAST_PLAN = null;
 
-<!-- MIN DEFENSIVE INNINGS -->
-<section id="min-innings" class="section">
-  <h2>Minimum Defensive Innings Tracker</h2>
-  <!-- tracker UI ... -->
-</section>
+function setup(){
+  const ctrl = $("#rosterCtrl");
+  ctrl.innerHTML = `
+    <div class="roster-controls inline">
+      <div>
+        <label class="small">View</label>
+        <select id="viewMode">
+          <option value="auto" selected>Auto</option>
+          <option value="table">Table</option>
+          <option value="cards">Cards</option>
+        </select>
+      </div>
+      <div>
+        <label class="small">Min Defensive Innings</label>
+        <select id="minTarget">${[1,2,3,4,5,6].map(v=>`<option value="${v}" ${v===4?'selected':''}>${v}</option>`).join('')}</select>
+      </div>
+      <div>
+        <label class="small">Late Innings</label>
+        <select id="lateMode">
+          <option value="balanced">Balanced</option>
+          <option value="tight" selected>Tight (5–6)</option>
+        </select>
+      </div>
+      
+    </div>`;
+  $("#viewMode").addEventListener('change', updateRosterVisibility);
+  $("#minTarget").addEventListener('change', ()=>{ build(); render([],{},[]); });
+  $("#lateMode").addEventListener('change', ()=>{ build(); });
+  $("#toggleEdit").addEventListener('click', ()=>{ EDIT_MODE = !EDIT_MODE; $("#toggleEdit").textContent = EDIT_MODE ? "Done Editing" : "Edit Rotation"; render(LAST_PLAN.plan, LAST_PLAN.mins, LAST_PLAN.minTarget); });
+
+  drawRoster();
+  updateRosterVisibility();
+  fillSelectors();
+  ['spTarget','rpTarget','clTarget'].forEach(id=>{
+    document.addEventListener('input', (e)=>{ if(e.target.id===id) updateRestBadges(); });
+  });
+  updateRestBadges();
+  $('#buildBtn').onclick=()=>build();
+  window.addEventListener('resize', updateRosterVisibility);
+}
+function getMinTarget(){ return Math.min(6, Math.max(1, parseInt($('#minTarget').value||'4',10))); }
+function getLateMode(){ return ($('#lateMode')?.value)||'tight'; }
+function updateRosterVisibility(){
+  const mode = $('#viewMode').value;
+  const autoCards = window.innerWidth <= 820;
+  const showCards = (mode==='cards') || (mode==='auto' && autoCards);
+  $('#rosterTableWrap').style.display = showCards ? 'none':'block';
+  $('#rosterCards').style.display = showCards ? 'block':'none';
+}
+function drawRoster(){
+  const tableWrap = $("#rosterTableWrap"); const cardsWrap = $("#rosterCards");
+  tableWrap.innerHTML=''; cardsWrap.innerHTML='';
+  const tbl = el('table','table');
+  tbl.innerHTML='<thead><tr><th>#</th><th>Name</th><th>Rank</th><th>Primary</th><th>Secondary</th><th>Avail</th></tr></thead>';
+  const tb=el('tbody','');
+  const posOpts=(val)=>POSITIONS.map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
+  const rankOpts=(val)=>Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
+  alpha(PLAYERS).forEach(p=>{ const tr=el('tr', p.available?'':'out'); tr.dataset.id=p.id;
+    tr.innerHTML='<td><b>'+p.number+'</b></td><td>'+p.last+', '+p.first+'</td>'
+      +'<td><select data-id="'+p.id+'" data-key="rank">'+rankOpts(p.rank||1)+'</select></td>'
+      +'<td><select data-id="'+p.id+'" data-key="primary">'+posOpts(p.primary)+'</select></td>'
+      +'<td><select data-id="'+p.id+'" data-key="secondary">'+posOpts(p.secondary)+'</select></td>'
+      +'<td><select data-id="'+p.id+'" data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></td>';
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb); const tw = el('div','table-wrap'); tw.appendChild(tbl); tableWrap.appendChild(tw);
+  tw.addEventListener('change', onRosterChange);
+
+  const list = el('div','cardlist');
+  alpha(PLAYERS).forEach(p=>{
+    const c = el('div','card'); c.dataset.id=p.id;
+    c.innerHTML = '<h4>#'+p.number+' — '+p.first+' '+p.last+'</h4>'
+      +'<div class="grid">'
+      +  '<div><label>Rank</label><select data-key="rank">'+Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===(p.rank||1)?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +  '<div><label>Avail</label><select data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></div>'
+      +  '<div><label>Primary</label><select data-key="primary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.primary?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +  '<div><label>Secondary</label><select data-key="secondary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.secondary?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +'</div>';
+    list.appendChild(c);
+  });
+  list.addEventListener('change', (e)=>{
+    const card = e.target.closest('.card'); const id = card.dataset.id; const key=e.target.dataset.key; const pl=get(id);
+    if(key==='available') pl.available = (e.target.value==='true'); else if(key==='rank') setUniqueRank(pl, parseInt(e.target.value,10)); else pl[key]=e.target.value;
+    fillSelectors();
+  });
+  $("#rosterCards").appendChild(list);
+}
+function onRosterChange(e){
+  if(e.target.tagName!=='SELECT') return;
+  const row = e.target.closest('tr'); const id=row.dataset.id; const key=e.target.dataset.key; const pl=get(id);
+  if(key==='available') pl.available = (e.target.value==='true');
+  else if(key==='rank') setUniqueRank(pl, parseInt(e.target.value,10));
+  else pl[key]=e.target.value;
+  row.className = pl.available ? '' : 'out';
+  fillSelectors();
+}
+function setUniqueRank(player, newRank){
+  const other = PLAYERS.find(p=>p.id!==player.id && p.rank===newRank);
+  if(other) other.rank = player.rank; // swap
+  player.rank = newRank;
+  drawRoster(); updateRosterVisibility();
+}
+function fillSelectors(){
+  const avail = alpha(PLAYERS.filter(p=>p.available));
+  for(const id of ['spSel','rpSel','clSel','scSel','rcSel','ccSel']){
+    const sel = $('#'+id); sel.innerHTML = '<option value="">—</option>';
+    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = p.last+', '+p.first+' ('+p.number+')'; sel.appendChild(o); });
+  }
+}
+function pitchersByInning(sp, rp, cl){ return [sp, sp, sp, rp, rp, cl]; }
+function catchersByInning(sc, rc, cc){ return [sc, sc, sc, rc, rc, cc]; }
+function scoreForPos(player, pos, prevPCPenaltyIds, inn, lateMode){
+  let s = 0;
+  if(player.primary===pos) s += 3; else if(player.secondary===pos) s += 1;
+  const infieldNon1B = ["2B","3B","SS"];
+  const isIF = infieldNon1B.includes(pos), isOF = ["LF","CF","RF"].includes(pos);
+  if(isIF && (infieldNon1B.includes(player.primary) || infieldNon1B.includes(player.secondary))) s += 1.5;
+  if(isOF && (["LF","CF","RF"].includes(player.primary) || ["LF","CF","RF"].includes(player.secondary))) s += 1.5;
+  if(prevPCPenaltyIds.has(player.id)) s -= 8;
+  if(lateMode==='tight' && inn>=5){ s += (13 - player.rank) * 0.9; }
+  return s;
+}
+const RULES = { thresholds:[{max:40,rest:0},{max:60,rest:1},{max:85,rest:2}] };
+function restDaysFor(pitches){ if(!pitches) return 0; if(pitches<=RULES.thresholds[0].max) return 0; if(pitches<=RULES.thresholds[1].max) return 1; return 2; }
+function badgeHTML(pitches){ const r = restDaysFor(pitches); const cls = r===0?'good':(r===1?'warn':'bad'); return `<span class="badge ${cls}">${(pitches||0)}p → ${r}d rest</span>`; }
+function updateRestBadges(){
+  const sp = parseInt(document.getElementById('spTarget')?.value||'0',10);
+  const rp = parseInt(document.getElementById('rpTarget')?.value||'0',10);
+  const cl = parseInt(document.getElementById('clTarget')?.value||'0',10);
+  document.getElementById('spBadge').outerHTML = badgeHTML(sp);
+  document.getElementById('rpBadge').outerHTML = badgeHTML(rp);
+  document.getElementById('clBadge').outerHTML = badgeHTML(cl);
+  const badges = document.querySelectorAll('.badge');
+  badges[0].id='spBadge'; badges[1].id='rpBadge'; badges[2].id='clBadge';
+}
+
+// Guard: prevent same player at P and C in the same inning
+function conflictsPC(sp,rp,cl,sc,rc,cc){
+  const pBy = pitchersByInning(sp,rp,cl);
+  const cBy = catchersByInning(sc,rc,cc);
+  const bad = [];
+  for(let i=0;i<6;i++){
+    if(pBy[i] && cBy[i] && pBy[i]===cBy[i]) bad.push(i+1);
+  }
+  return bad;
+}
+
+function build(){
+  $('#alerts').innerHTML='';
+  const spId = $('#spSel').value || null;
+  const rpId = $('#rpSel').value || null;
+  const clId = $('#clSel').value || null;
+  const scId = $('#scSel').value || null;
+  const rcId = $('#rcSel').value || null;
+  const ccId = $('#ccSel').value || null;
+  if(!spId){ $('#alerts').innerHTML='<div class="alert">Choose a <b>Starting Pitcher</b>.</div>'; return; }
+  if(!scId){ $('#alerts').innerHTML='<div class="alert">Choose a <b>Starting Catcher</b>.</div>'; return; }
+
+  const bad = conflictsPC(spId,rpId,clId,scId,rcId,ccId);
+  if(bad.length){
+    $('#alerts').innerHTML='<div class="alert"><b>P and C cannot be the same player</b> in inning(s): '+bad.join(', ')+' — please adjust catcher selections.</div>';
+    return;
+  }
+
+  const pBy = pitchersByInning(spId, rpId, clId);
+  const cBy = catchersByInning(scId, rcId, ccId);
+  const MIN_T = getMinTarget();
+  const lateMode = getLateMode();
+  const available = alpha(PLAYERS.filter(p=>p.available));
+  const plan=[]; const mins={}; PLAYERS.forEach(p=>mins[p.id]=0);
+  const reservedEH={}; // by block
+
+  for(let inn=1; inn<=6; inn++){
+    const bi = inn<=2 ? 0 : (inn<=4 ? 1 : 2);
+    const used=new Set([pBy[inn-1], cBy[inn-1]]);
+    const inning={P:pBy[inn-1],C:cBy[inn-1],'1B':null,'2B':null,'3B':null,'SS':null,'LF':null,'CF':null,'RF':null,'EH':[]};
+    if(inning.P) mins[inning.P]=(mins[inning.P]||0)+1;
+    if(inning.C) mins[inning.C]=(mins[inning.C]||0)+1;
+    const blockedEH = new Set();
+    if((inn%2)===0 && reservedEH[bi]) reservedEH[bi].forEach(id=>blockedEH.add(id));
+    const prevPCPenaltyIds = new Set();
+    if(inn>1){ if(pBy[inn-2]) prevPCPenaltyIds.add(pBy[inn-2]); if(cBy[inn-2]) prevPCPenaltyIds.add(cBy[inn-2]); }
+    const urgencyWeight = (lateMode==='tight' && inn>=5) ? 4 : 10;
+
+    const pool = ()=>available.filter(pl=>!used.has(pl.id) && !blockedEH.has(pl.id));
+    function chooseBest(pos, list){
+      let best=null, bestScore=-1e9;
+      for(const pl of list){
+        const s = scoreForPos(pl,pos, prevPCPenaltyIds, inn, lateMode);
+        const urg = Math.max(0, MIN_T - (mins[pl.id]||0));
+        const comp=urg*urgencyWeight + s;
+        if(comp>bestScore || (comp===bestScore && nameKey(pl) < nameKey(best?get(best):pl))){ best=pl.id; bestScore=comp; }
+      }
+      return best;
+    }
+    // Hard-locked 1B/SS first
+    const specPool = (pos)=>pool().filter(pl=> (pos==='1B'?(pl.primary==='1B'||pl.secondary==='1B'):(pl.primary==='SS'||pl.secondary==='SS')) );
+    for(const pos of ['1B','SS']){
+      const list=specPool(pos);
+      if(list.length){ const id=chooseBest(pos, list); inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
+    }
+    // Fill generics with SS after 3B for flow
+    for(const pos of ['2B','3B','SS','CF','LF','RF']){
+      if(inning[pos]) continue;
+      const id=chooseBest(pos, pool()); if(id){ inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
+    }
+    // If special still empty, allow pulls from reservedEH (then recompute EH)
+    function pullFromLockedEH(pos, qual){
+      if(inning[pos]) return false;
+      const list=(reservedEH[bi]||[]).filter(id=>qual(get(id)) && !used.has(id));
+      if(list.length){
+        list.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
+        const id=list[0]; inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; blockedEH.delete(id);
+        return true;
+      }
+      return false;
+    }
+    let pulled = false;
+    pulled = pullFromLockedEH('1B', p=>p.primary==='1B'||p.secondary==='1B') || pulled;
+    pulled = pullFromLockedEH('SS', p=>p.primary==='SS'||p.secondary==='SS') || pulled;
+
+    // Final EH calc with guaranteed fill
+    const remaining = available.map(p=>p.id).filter(id=>!used.has(id));
+    if((inn%2)===1){
+      inning.EH = remaining;
+      reservedEH[bi] = remaining.slice();
+    } else {
+      let base = (reservedEH[bi]||[]).filter(id=>!used.has(id));
+      if(pulled){
+        // top up base after a pull, using remaining not in base
+        const extras = remaining.filter(id=>!base.includes(id));
+        extras.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
+        base = base.concat(extras);
+      } else {
+        const need = remaining.length - base.length;
+        if(need>0){
+          const extras = remaining.filter(id=>!base.includes(id));
+          extras.sort((a,b)=>get(a).rank-get(b).rank || nameKey(get(a)).localeCompare(nameKey(get(b))));
+          base = base.concat(extras.slice(0,need));
+        }
+      }
+      inning.EH = base;
+    }
+    plan.push(inning);
+  }
+  LAST_PLAN = {plan, mins, minTarget:getMinTarget()};
+  render(plan, mins, getMinTarget());
+}
+
+function makePlayerSelect(inningIdx, pos, currentId){
+  const sel = document.createElement('select');
+  const planRow = LAST_PLAN.plan[inningIdx];
+  const used = new Set(['P','C','1B','2B','3B','SS','LF','CF','RF'].map(k=>planRow[k]).filter(Boolean));
+  if(currentId) used.delete(currentId);
+  const avail = alpha(PLAYERS.filter(p=>p.available));
+  const opt = document.createElement('option'); opt.value=''; opt.textContent='—'; sel.appendChild(opt);
+  avail.forEach(p=>{
+    if(!used.has(p.id)){
+      const o=document.createElement('option'); o.value=p.id; o.textContent = nameKey(p);
+      if(p.id===currentId) o.selected=true;
+      sel.appendChild(o);
+    }
+  });
+  sel.addEventListener('change', ()=>{
+    const id = sel.value || null;
+    LAST_PLAN.plan[inningIdx][pos] = id;
+    recomputeAfterManual(inningIdx);
+  });
+  return sel;
+}
+
+function recomputeAfterManual(inningIdx){
+  const plan = LAST_PLAN.plan;
+  const mins = {}; PLAYERS.forEach(p=>mins[p.id]=0);
+  for(let i=0;i<6;i++){
+    const row = plan[i];
+    const used = new Set(['P','C','1B','2B','3B','SS','LF','CF','RF'].map(k=>row[k]).filter(Boolean));
+    const available = alpha(PLAYERS.filter(p=>p.available)).map(p=>p.id);
+    row.EH = available.filter(id=>!used.has(id));
+    used.forEach(id=>{ mins[id]=(mins[id]||0)+1; });
+  }
+  LAST_PLAN.mins = mins;
+  render(plan, mins, LAST_PLAN.minTarget);
+}
+
+function render(plan, mins, MIN_T){
+  const INNINGS=[1,2,3,4,5,6];
+  const wrap=$("#planWrap"); wrap.innerHTML='';
+  const tbl=el('table','table'); tbl.innerHTML='<thead><tr><th>Pos</th>'+INNINGS.map(i=>`<th>${i}</th>`).join('')+'</tr></thead>';
+  const tb=el('tbody','');
+  function cellVal(v){ if(!v) return '—'; return short(get(v)); }
+  function ehVal(arr){ return '<div class="stack">'+arr.map(id=>'<span>'+short(get(id))+'</span>').join('')+'</div>'; }
+  const order = ['P','C','1B','2B','3B','SS','LF','CF','RF','EH'];
+  order.forEach((pos)=>{
+    const tr=el('tr','');
+    tr.appendChild((()=>{const td=el('td',''); td.innerHTML='<b>'+pos+'</b>'; return td;})());
+    INNINGS.forEach((i)=>{
+      const td=el('td','');
+      const row=plan[i-1];
+      if(pos==='EH'){ td.innerHTML = ehVal(row.EH||[]); }
+      else if(EDIT_MODE && pos!=='P' && pos!=='C'){
+        const sel = makePlayerSelect(i-1, pos, row[pos]);
+        td.appendChild(sel);
+      } else {
+        td.textContent = cellVal(row[pos]);
+      }
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+  const wrapDiv=el('div','table-wrap'); wrapDiv.appendChild(tbl); wrap.appendChild(wrapDiv);
+
+  const totals=$("#totals"); totals.innerHTML='';
+  alpha(PLAYERS).forEach(p=>{ const got=mins[p.id]||0; const target=parseInt($('#minTarget').value||'4',10); const pct=Math.min(100, got/target*100); const bar='<div class="bar"><span style="width:'+pct+'%"></span></div>'; const label = short(p)+' — '+got+'/'+target+(got>=target?' ✔':' •')+' (rank '+p.rank+')'; const pill=el('div','pill'); pill.innerHTML = label+' '+bar; if(!p.available) pill.classList.add('out'); totals.appendChild(pill); });
+}
+
+function updateRestBadges(){
+  const sp = parseInt(document.getElementById('spTarget')?.value||'0',10);
+  const rp = parseInt(document.getElementById('rpTarget')?.value||'0',10);
+  const cl = parseInt(document.getElementById('clTarget')?.value||'0',10);
+  const RULES = { thresholds:[{max:40,rest:0},{max:60,rest:1},{max:85,rest:2}] };
+  function restDaysFor(pitches){ if(!pitches) return 0; if(pitches<=RULES.thresholds[0].max) return 0; if(pitches<=RULES.thresholds[1].max) return 1; return 2; }
+  function asBadge(p){
+    const r=restDaysFor(p); const cls = r===0?'good':(r===1?'warn':'bad');
+    return `<span class="badge ${cls}">${(p||0)}p → ${r}d rest</span>`;
+  }
+  document.getElementById('spBadge').outerHTML = asBadge(sp);
+  document.getElementById('rpBadge').outerHTML = asBadge(rp);
+  document.getElementById('clBadge').outerHTML = asBadge(cl);
+  const badges = document.querySelectorAll('.badge');
+  badges[0].id='spBadge'; badges[1].id='rpBadge'; badges[2].id='clBadge';
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ console.error(e); alert('Init error: '+e.message); } });
+</script>
+</body>
+</html>
