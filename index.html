@@ -247,7 +247,7 @@ function fillSelectors(){
   const avail = alpha(PLAYERS.filter(p=>p.available));
   for(const id of ['spSel','rpSel','clSel','scSel','rcSel','ccSel']){
     const sel = $('#'+id); sel.innerHTML = '<option value="">—</option>';
-    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = +p.first+' ('+p.number+')'; sel.appendChild(o); });
+    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = p.first+' ('+p.number+')'; sel.appendChild(o); });
   }
 }
 function pitchersByInning(sp, rp, cl){ return [sp, sp, sp, rp, rp, cl]; }
@@ -399,7 +399,7 @@ function makePlayerSelect(inningIdx, pos, currentId){
   const opt = document.createElement('option'); opt.value=''; opt.textContent='—'; sel.appendChild(opt);
   avail.forEach(p=>{
     if(!used.has(p.id)){
-      const o=document.createElement('option'); o.value=p.id; o.textContent = nameKey(p);
+      const o=document.createElement('option'); o.value=p.id; o.textContent = short(p);
       if(p.id===currentId) o.selected=true;
       sel.appendChild(o);
     }
