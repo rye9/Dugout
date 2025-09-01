@@ -133,7 +133,7 @@ const PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "A
 const POSITIONS = ["1B","2B","3B","SS","LF","CF","RF","—"];
 const $ = (sel)=>document.querySelector(sel);
 const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
-const nameKey=(p)=>`${p.last}, ${p.first}`;
+const nameKey=(p)=>`${p.first}, ${p.number}`;
 const short=(p)=>`${p.first} (${p.number})`;
 const get=(id)=>PLAYERS.find(p=>p.id===id);
 function alpha(list){ return [...list].sort((a,b)=>nameKey(a).localeCompare(nameKey(b))); }
@@ -199,7 +199,7 @@ function drawRoster(){
   const posOpts=(val)=>POSITIONS.map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
   const rankOpts=(val)=>Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
   alpha(PLAYERS).forEach(p=>{ const tr=el('tr', p.available?'':'out'); tr.dataset.id=p.id;
-    tr.innerHTML='<td><b>'+p.number+'</b></td><td>'+p.last+', '+p.first+'</td>'
+    tr.innerHTML='<td><b>'+p.number+'</b></td><td>'+p.first+'</td>'
       +'<td><select data-id="'+p.id+'" data-key="rank">'+rankOpts(p.rank||1)+'</select></td>'
       +'<td><select data-id="'+p.id+'" data-key="primary">'+posOpts(p.primary)+'</select></td>'
       +'<td><select data-id="'+p.id+'" data-key="secondary">'+posOpts(p.secondary)+'</select></td>'
@@ -212,7 +212,7 @@ function drawRoster(){
   const list = el('div','cardlist');
   alpha(PLAYERS).forEach(p=>{
     const c = el('div','card'); c.dataset.id=p.id;
-    c.innerHTML = '<h4>#'+p.number+' — '+p.first+' '+p.last+'</h4>'
+    c.innerHTML = '<h4>#'+p.number+' — '+p.first+'</h4>'
       +'<div class="grid">'
       +  '<div><label>Rank</label><select data-key="rank">'+Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===(p.rank||1)?'selected':''}>${v}</option>`).join('')+'</select></div>'
       +  '<div><label>Avail</label><select data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></div>'
@@ -247,7 +247,7 @@ function fillSelectors(){
   const avail = alpha(PLAYERS.filter(p=>p.available));
   for(const id of ['spSel','rpSel','clSel','scSel','rcSel','ccSel']){
     const sel = $('#'+id); sel.innerHTML = '<option value="">—</option>';
-    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = p.last+', '+p.first+' ('+p.number+')'; sel.appendChild(o); });
+    avail.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = +p.first+' ('+p.number+')'; sel.appendChild(o); });
   }
 }
 function pitchersByInning(sp, rp, cl){ return [sp, sp, sp, rp, rp, cl]; }
