@@ -136,7 +136,7 @@ const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return 
 const nameKey=(p)=>`${p.last}, ${p.first}`;
 const short=(p)=>`${p.first} (${p.number})`;
 const get=(id)=>PLAYERS.find(p=>p.id===id);
-function alpha(list){ return [...list].sort((a,b)=>nameKey(a).localeCompare(nameKey(b))); }
+function alpha(list){ return [...list].sort((a,b)=>a.first.localeCompare(b.first)); }
 
 let EDIT_MODE = false;
 let LAST_PLAN = null;
