@@ -156,6 +156,6 @@ button, .btn {
 /* Extra breathing room for rest-day badges under pitcher fields */
 .row .badge {
   margin-top: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
   display: inline-block;
 }
