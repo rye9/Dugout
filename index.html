@@ -123,7 +123,7 @@ input[type=number]{width:64px}
     </section>
 
     <section class="panel">
-      <h2>Minimum Defensive Innings Tracker</h2>
+      <h2>Defensive Innings Tracker</h2>
       <div id="totals" class="flex"></div>
     </section>
   </main>
@@ -455,7 +455,7 @@ function render(plan, mins, MIN_T){
   const wrapDiv=el('div','table-wrap'); wrapDiv.appendChild(tbl); wrap.appendChild(wrapDiv);
 
   const totals=$("#totals"); totals.innerHTML='';
-  alpha(PLAYERS).forEach(p=>{ const got=mins[p.id]||0; const target=parseInt($('#minTarget').value||'4',10); const pct=Math.min(100, got/target*100); const bar='<div class="bar"><span style="width:'+pct+'%"></span></div>'; const label = short(p)+' — '+got+'/'+target+(got>=target?' ✔':' •')+' (rank '+p.rank+')'; const pill=el('div','pill'); pill.innerHTML = label+' '+bar; if(!p.available) pill.classList.add('out'); totals.appendChild(pill); });
+  alpha(PLAYERS).forEach(p=>{ const got=mins[p.id]||0; const target=parseInt($('#minTarget').value||'4',10); const pct=Math.min(100, got/target*100); const bar='<div class="bar"><span style="width:'+pct+'%"></span></div>'; const label = short(p)+' — '+got+'/'+target+(got>=target?' ✔':' •'); const pill=el('div','pill'); pill.innerHTML = label+' '+bar; if(!p.available) pill.classList.add('out'); totals.appendChild(pill); });
 }
 
 function updateRestBadges(){
