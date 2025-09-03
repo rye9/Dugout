@@ -251,3 +251,30 @@ button:active, .btn:active, .actions button:active { transform: translateY(1px);
 .row input[type="text"] {
   height: 44px;
 }
+
+/* --- FIX iOS SELECT CLIPPING & CENTERING --- */
+/* 1) Stop forcing a fixed line-height on selects */
+.row select {
+  height: auto !important;     /* let iOS size it naturally */
+  min-height: 44px;            /* keep tap target big */
+  line-height: normal !important;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: block;              /* avoids inline-box quirks */
+  white-space: nowrap;         /* don't wrap names */
+  -webkit-appearance: menulist;/* restore native metrics */
+  background-clip: padding-box;/* prevent border clipping */
+}
+
+/* 2) Keep fixed height only on inputs, not selects */
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;
+  line-height: 44px;
+}
+
+/* Optional: crisper focus ring without shifting layout */
+.row select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(105,166,255,.55);
+}
