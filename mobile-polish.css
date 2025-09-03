@@ -565,3 +565,66 @@ select {
     grid-template-columns: repeat(4, minmax(0,1fr));
   }
 }
+
+/* --- Player card fields: always fit 4 controls inside the card --- */
+
+/* Base: 2×2 grid inside each card (Rank | Avail) / (Primary | Secondary) */
+.player-card__fields,
+.card .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* columns can shrink */
+  gap: 10px 12px;                                   /* tight but readable */
+}
+
+/* Let items actually shrink and clip safely inside rounded cards */
+.player-card,
+.card { overflow: hidden; }
+.player-card__fields .field,
+.card .grid .field {
+  min-width: 0;           /* critical for grid shrinkage on iOS */
+  overflow: hidden;       /* stop any paint bleed */
+  position: relative;
+}
+
+/* Controls stay within their column and adapt to width */
+.player-card__fields .field select,
+.player-card__fields .field input,
+.card .grid .field select,
+.card .grid .field input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 12px;     /* slightly tighter on mobile than global */
+  font-size: 16px;        /* avoids iOS zoom */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Very small phones: reduce padding a hair so two columns still fit */
+@media (max-width: 390px) {
+  .player-card__fields,
+  .card .grid { gap: 8px 10px; }
+
+  .player-card__fields .field select,
+  .player-card__fields .field input,
+  .card .grid .field select,
+  .card .grid .field input {
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 15px;
+  }
+}
+
+/* Ultra-narrow edge case: stack to a single column so nothing overflows */
+@media (max-width: 340px) {
+  .player-card__fields,
+  .card .grid { grid-template-columns: 1fr; }
+}
+
+/* Desktop/wide screens: can show 4-up layout again if desired */
+@media (min-width: 721px) {
+  .player-card__fields,
+  .card .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
