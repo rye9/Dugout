@@ -236,9 +236,10 @@ button:active, .btn:active, .actions button:active {
   .twocol { grid-template-columns: 1fr 1fr; column-gap: 48px; }
 }
 
-/* Make all main buttons have white text */
-button,
-.btn,
+/* Force white text for these key buttons */
+#buildBtn,
+#toggleEdit,
 .actions button {
-  color: #fff !important;
+  color: #ffffff !important;
 }
+
