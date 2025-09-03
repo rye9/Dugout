@@ -235,3 +235,10 @@ button:active, .btn:active, .actions button:active {
 @media (min-width: 900px) {
   .twocol { grid-template-columns: 1fr 1fr; column-gap: 48px; }
 }
+
+/* Make all main buttons have white text */
+button,
+.btn,
+.actions button {
+  color: #fff !important;
+}
