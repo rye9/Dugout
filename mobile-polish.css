@@ -278,3 +278,42 @@ button:active, .btn:active, .actions button:active { transform: translateY(1px);
   outline: none;
   box-shadow: 0 0 0 3px rgba(105,166,255,.55);
 }
+
+/* ============================
+   FINAL SELECT FIX (iOS-safe)
+   ============================ */
+
+/* 1) Restore native sizing/metrics for selects.
+   - No fixed line-height
+   - Height is automatic but with a min tap size
+   - Bring back native menulist metrics (not 'none')
+*/
+.row select {
+  -webkit-appearance: menulist !important;  /* restore native iOS metrics */
+  appearance: menulist !important;
+  height: auto !important;                  /* let iOS calculate */
+  min-height: 44px;                         /* keep tap target big */
+  line-height: normal !important;           /* prevent vertical clipping */
+  padding-top: 10px;                        /* keep visual height */
+  padding-bottom: 10px;
+  display: block;                           /* avoid inline-box quirks */
+  white-space: nowrap;                      /* don’t wrap names */
+  background-clip: padding-box;             /* prevent border bleed */
+  font-size: 16px;                          /* avoids iOS zoom & odd baselines */
+}
+
+/* 2) Keep fixed height ONLY on inputs (not selects) to preserve alignment */
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;
+  line-height: 44px;
+}
+
+/* 3) Ensure the row centers label vs control without forcing select height */
+.twocol .row { align-items: center; }
+
+/* Optional: nicer focus ring that doesn't shift layout */
+.row select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(105,166,255,.55);
+}
