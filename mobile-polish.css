@@ -487,3 +487,36 @@ select {
   }
 }
 
+/* === Fix player card dropdown width inside cards === */
+.card .grid,
+.player-card__fields {
+  grid-template-columns: 1fr 1fr;     /* always split evenly in two */
+  gap: 12px;                          /* tighten gap so both fit */
+}
+
+.card .grid .field,
+.player-card__fields .field {
+  min-width: 0;                       /* let children shrink */
+}
+
+.card .grid select,
+.player-card__fields select,
+.card .grid input,
+.player-card__fields input {
+  width: 100%;                        /* stay inside grid column */
+  max-width: 100%;                    /* never overflow card */
+  box-sizing: border-box;             /* borders + padding inside width */
+  min-height: 44px;
+  font-size: 16px;                    /* iOS zoom-safe */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;            /* cut off long words nicely */
+}
+
+/* On wider screens, restore 4 columns but still clamp widths */
+@media (min-width: 721px) {
+  .card .grid,
+  .player-card__fields {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
