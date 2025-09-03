@@ -393,3 +393,64 @@ select {
   .row input[type="number"] { flex: 0 0 54px; min-width: 54px; }
   .row .mini { min-width: auto; }
 }
+
+/* === MOBILE LAYOUT: stack fields again (select on its own line, labels/inputs below) === */
+@media (max-width: 720px) {
+  .twocol .row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;  /* one column -> everything stacks */
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+  .twocol .row .mini { margin-top: 2px; }   /* small breathing room for "Innings" / "Pitches" labels */
+}
+
+/* === SELECT: match input look, no clipping, no grey iOS style === */
+.twocol .row select,
+.row select,
+select {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  /* iOS-safe sizing: never force line-height == height */
+  height: 44px !important;
+  min-height: 44px !important;
+  line-height: normal !important;
+  padding: 10px 36px 10px 12px !important;  /* room for caret on the right */
+
+  /* match your input visuals */
+  border-radius: 10px !important;
+  border: 1px solid var(--card-b) !important;
+  background-color: rgba(255,255,255,0.04) !important;
+  color: inherit !important;
+
+  /* long names behave */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+
+  /* custom caret that fits the theme (# -> %23) */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2369a6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 14px !important;
+  background-clip: padding-box !important;
+
+  /* keep selects the width priority in multi-control rows */
+  flex: 1 1 280px !important;
+  min-width: 220px !important;
+}
+
+/* Keep inputs fixed to align rows, but DO NOT re-apply to selects */
+.twocol .row input[type="number"],
+.twocol .row input[type="text"] {
+  height: 44px !important;
+  line-height: 44px !important;
+}
+
+/* Desktop: number inputs don't steal width from the select */
+@media (min-width: 900px) {
+  .twocol .row input[type="number"] { flex: 0 0 54px !important; min-width: 54px !important; }
+  .twocol .row .mini { min-width: auto !important; }
+}
