@@ -279,41 +279,60 @@ button:active, .btn:active, .actions button:active { transform: translateY(1px);
   box-shadow: 0 0 0 3px rgba(105,166,255,.55);
 }
 
-/* ============================
-   FINAL SELECT FIX (iOS-safe)
-   ============================ */
-
-/* 1) Restore native sizing/metrics for selects.
-   - No fixed line-height
-   - Height is automatic but with a min tap size
-   - Bring back native menulist metrics (not 'none')
-*/
+/* ================================
+   Unified SELECT style (app look)
+   — no clipping, matches inputs
+   ================================ */
 .row select {
-  -webkit-appearance: menulist !important;  /* restore native iOS metrics */
-  appearance: menulist !important;
-  height: auto !important;                  /* let iOS calculate */
-  min-height: 44px;                         /* keep tap target big */
-  line-height: normal !important;           /* prevent vertical clipping */
-  padding-top: 10px;                        /* keep visual height */
-  padding-bottom: 10px;
-  display: block;                           /* avoid inline-box quirks */
-  white-space: nowrap;                      /* don’t wrap names */
-  background-clip: padding-box;             /* prevent border bleed */
-  font-size: 16px;                          /* avoids iOS zoom & odd baselines */
+  /* Use custom look, not the grey iOS menulist */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  /* Size: do NOT force line-height == height */
+  height: 44px;
+  min-height: 44px;
+  line-height: 1.2;                 /* natural text baseline (prevents clipping) */
+  padding: 10px 36px 10px 12px;     /* extra right room for caret */
+
+  /* Match your input visuals */
+  border-radius: 10px;
+  border: 1px solid var(--card-b);
+  background: rgba(255,255,255,0.04);
+  color: inherit;
+
+  /* Keep single-line names and avoid wrap */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  /* Custom caret to replace the native one */
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%69a6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  background-clip: padding-box;      /* avoids border artifacts */
 }
 
-/* 2) Keep fixed height ONLY on inputs (not selects) to preserve alignment */
+/* Focus style to match buttons/inputs */
+.row select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(105,166,255,.45);
+  border-color: rgba(105,166,255,.65);
+}
+
+/* Give selects width priority so names stay visible */
+.row select { flex: 1 1 280px; min-width: 220px; }
+
+/* Inputs keep fixed height (for row alignment) */
 .row input[type="number"],
 .row input[type="text"] {
   height: 44px;
   line-height: 44px;
 }
 
-/* 3) Ensure the row centers label vs control without forcing select height */
-.twocol .row { align-items: center; }
-
-/* Optional: nicer focus ring that doesn't shift layout */
-.row select:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(105,166,255,.55);
+/* Desktop tweak: number inputs don’t steal width from the select */
+@media (min-width: 900px) {
+  .row input[type="number"] { flex: 0 0 54px; min-width: 54px; }
+  .row .mini { min-width: auto; }
 }
