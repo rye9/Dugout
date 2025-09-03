@@ -454,3 +454,36 @@ select {
   .twocol .row input[type="number"] { flex: 0 0 54px !important; min-width: 54px !important; }
   .twocol .row .mini { min-width: auto !important; }
 }
+
+/* Player card field sizing: prevent overflow & keep controls inside the card */
+.player-card__fields,
+.card .grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* strong minmax on mobile */
+}
+
+.player-card__fields .field,
+.card .grid .field {
+  min-width: 0;                 /* allow shrinking inside grid columns */
+}
+
+.player-card__fields .field select,
+.player-card__fields .field input,
+.card .grid .field select,
+.card .grid .field input {
+  width: 100%;
+  box-sizing: border-box;       /* include padding/border in width calc */
+  min-height: 44px;             /* consistent tap target */
+  font-size: 16px;              /* avoids iOS zoom */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* On wider screens, return to 4-up grid but keep minmax to avoid overflow */
+@media (min-width: 721px) {
+  .player-card__fields,
+  .card .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
