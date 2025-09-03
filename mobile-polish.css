@@ -336,3 +336,60 @@ button:active, .btn:active, .actions button:active { transform: translateY(1px);
   .row input[type="number"] { flex: 0 0 54px; min-width: 54px; }
   .row .mini { min-width: auto; }
 }
+
+/* === SELECT: app look, no clipping, overrides previous !important rules === */
+.twocol .row select,
+.row select,
+select {
+  /* take back control from earlier menulist !important */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  /* iOS-safe sizing (no fixed line-height) */
+  height: auto !important;
+  min-height: 44px !important;
+  line-height: normal !important;
+  font-size: 16px;                 /* prevents iOS zoom + baseline quirks */
+  box-sizing: border-box !important;
+  display: block;
+
+  /* visual match with inputs */
+  padding: 10px 36px 10px 12px !important;  /* space for caret */
+  border-radius: 10px !important;
+  border: 1px solid var(--card-b) !important;
+  background-color: rgba(255,255,255,0.04) !important;
+  color: inherit !important;
+
+  /* single-line label */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+
+  /* custom caret (encoded # as %23) */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2369a6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 14px !important;
+  background-clip: padding-box !important;
+}
+
+.row select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(105,166,255,.45);
+  border-color: rgba(105,166,255,.65);
+}
+
+/* keep inputs fixed for row alignment (do NOT apply to selects) */
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;
+  line-height: 44px;
+}
+
+/* ensure the select has width priority so names stay visible */
+.row select { flex: 1 1 280px; min-width: 220px; }
+@media (min-width: 900px) {
+  .row input[type="number"] { flex: 0 0 54px; min-width: 54px; }
+  .row .mini { min-width: auto; }
+}
