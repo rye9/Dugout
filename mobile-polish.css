@@ -628,3 +628,61 @@ select {
   .player-card__fields,
   .card .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* === Player card controls: never overlap === */
+
+/* Auto-fit grid: each control gets at least 180px; if not available, it wraps */
+.player-card__fields,
+.card .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* Allow grid children to actually shrink; prevent paint bleed on iOS */
+.player-card,
+.card { overflow: hidden; }
+
+.player-card__fields .field,
+.card .grid .field {
+  min-width: 0;                /* critical so children can shrink */
+  overflow: hidden;            /* clip any focus/paint overflow */
+  position: relative;
+  contain: layout paint style; /* iOS/WebKit isolation */
+}
+
+/* Inputs/selects are constrained to their cell */
+.player-card__fields .field select,
+.player-card__fields .field input,
+.card .grid .field select,
+.card .grid .field input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fine-tune for very small phones: slightly tighter spacing & padding */
+@media (max-width: 390px) {
+  .player-card__fields,
+  .card .grid { gap: 10px; }
+  .player-card__fields .field select,
+  .player-card__fields .field input,
+  .card .grid .field select,
+  .card .grid .field input {
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 15px;
+  }
+}
+
+/* Wide screens: comfortably show 4 across, still respecting min width */
+@media (min-width: 960px) {
+  .player-card__fields,
+  .card .grid {
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+  }
+}
