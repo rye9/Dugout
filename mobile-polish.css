@@ -221,3 +221,33 @@ button:active, .btn:active, .actions button:active { transform: translateY(1px);
   .row { align-items: center; }
   .row select, .row input { height: 42px; } /* consistent control height */
 }
+
+/* Prevent select text from clipping; let iOS render natural line-height */
+.row select {
+  line-height: normal;          /* undo the 44px line-height for selects */
+  padding-top: 10px;            /* keep the visual height you like */
+  padding-bottom: 10px;
+  white-space: nowrap;          /* don't wrap player names */
+}
+
+/* Make the select take priority width in the row */
+.row select {
+  flex: 1 1 280px;              /* grow, and don't shrink below ~280px */
+  min-width: 220px;             /* absolute floor so names remain visible */
+}
+
+/* Give the number inputs a bit less width so select has room */
+@media (min-width: 900px) {
+  .row input[type="number"] {
+    min-width: 54px;            /* was larger; trims a few px */
+    flex: 0 0 54px;             /* fixed so it won't steal width */
+  }
+  .row .mini { min-width: auto; } /* let "Innings"/"Pitches" labels flex */
+}
+
+/* Keep the overall control height consistent, without forcing line-height on selects */
+.row select,
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;
+}
