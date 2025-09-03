@@ -520,3 +520,48 @@ select {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* --- iOS fix: keep player-card controls inside the card --- */
+
+/* 1) Clip anything that paints outside rounded cards */
+.card,
+.player-card {
+  overflow: hidden;                 /* clips the select's painted area */
+}
+
+/* 2) Also clip at the field level (safer focus/hover states) */
+.card .grid .field,
+.player-card__fields .field {
+  min-width: 0;                     /* allow shrinking inside grid */
+  overflow: hidden;                 /* prevent control bleed past column */
+  position: relative;               /* create a clipping context */
+  contain: layout paint style;      /* isolate painting on iOS */
+}
+
+/* 3) Constrain controls to their column */
+.card .grid select,
+.player-card__fields select,
+.card .grid input,
+.player-card__fields input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 4) Tighten mobile card grid so both columns fit comfortably */
+.card .grid,
+.player-card__fields {
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;                        /* slightly smaller than 12px */
+}
+
+@media (min-width: 721px) {
+  .card .grid,
+  .player-card__fields {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+  }
+}
