@@ -1,13 +1,23 @@
 /* --- Mobile polish for iOS Safari --- */
+/* =========================================================
+   1) Design Tokens / Base
+   ========================================================= */
 :root {
   --gap-xxs: 6px; --gap-xs: 10px; --gap-s: 12px; --gap-m: 16px; --gap-l: 20px; --gap-xl: 26px;
-  --radius: 10px; --card: rgba(255,255,255,0.06); --card-b: rgba(255,255,255,0.10);
+  --radius: 10px;
+  --card: rgba(255,255,255,0.06);
+  --card-b: rgba(255,255,255,0.10);
   --muted: rgba(255,255,255,0.65);
+  /* accent used in buttons; fallback provided where referenced */
 }
 
 html { -webkit-text-size-adjust: 100%; }
 
-select, input[type="text"], input[type="number"] {
+label { font-size: 12px; color: var(--muted); }
+
+select,
+input[type="text"],
+input[type="number"] {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
@@ -16,9 +26,12 @@ select, input[type="text"], input[type="number"] {
   color: inherit;
   -webkit-appearance: none;
 }
-label { font-size: 12px; color: var(--muted); }
 
-/* Section containers */
+input[type="number"] { text-align: center; min-width: 54px; }
+
+/* =========================================================
+   2) Containers / Panels
+   ========================================================= */
 section, .section {
   margin: var(--gap-l) 0;
   padding: var(--gap-m);
@@ -27,7 +40,9 @@ section, .section {
   border-radius: var(--radius);
 }
 
-/* ---------- ROSTER ---------- */
+/* =========================================================
+   3) Roster
+   ========================================================= */
 .roster-controls{
   padding: 12px;
   background: rgba(255,255,255,0.04);
@@ -47,6 +62,7 @@ section, .section {
   letter-spacing: .2px;
 }
 
+/* Cards */
 .card, .player-card {
   margin-bottom: var(--gap-m);
   padding: var(--gap-m);
@@ -54,7 +70,6 @@ section, .section {
   border: 1px solid var(--card-b);
   border-radius: var(--radius);
 }
-
 .card .grid, .player-card__fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -65,7 +80,9 @@ section, .section {
   gap: var(--gap-xxs);
 }
 
-/* ---------- GAME SETUP ---------- */
+/* =========================================================
+   4) Game Setup
+   ========================================================= */
 .setup-block { display: grid; gap: var(--gap-m); }
 
 .role-row {
@@ -80,7 +97,7 @@ section, .section {
   padding-top: 18px;
   border-top: 1px dashed var(--card-b);
 }
-
+.role-row .cell { display: grid; gap: var(--gap-xxs); }
 .role-row .cell:first-child label{
   font-weight: 700;
   font-size: 14px;
@@ -88,10 +105,19 @@ section, .section {
   color: #e7edf6;
 }
 
-.role-row .cell { display: grid; gap: var(--gap-xxs); }
-input[type="number"] { text-align: center; min-width: 54px; }
+/* Normalize control & row heights for perfect column alignment */
+.row select,
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;
+  line-height: 44px; /* keeps text vertically centered */
+}
+.twocol .row {
+  align-items: center;   /* center labels vs controls */
+  min-height: 64px;      /* equalize pitcher/catcher rows */
+}
 
-/* Rest-day pill with more breathing room */
+/* Rest-day pill (spacing + look) */
 .pill {
   padding: 8px 14px;
   border-radius: 999px;
@@ -101,24 +127,29 @@ input[type="number"] { text-align: center; min-width: 54px; }
   background: rgba(255,255,255,0.08);
   text-align: center;
   white-space: nowrap;
-
-  margin-top: 10px;
-  margin-bottom: 14px;
-  margin-left: 6px;
-  margin-right: 6px;
+  margin: 10px 6px 14px 6px;
   display: inline-block;
 }
 
-/* ---------- Buttons ---------- */
-button, .btn {
-  padding: 12px 14px;
-  border-radius: 12px;
+/* Rest-day badges + catcher spacers (keep exact same footprint) */
+.badge { padding: 8px 12px; }
+.row .badge {
+  margin-top: 12px;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+.badge.spacer {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
   border: 1px solid var(--card-b);
-  background: rgba(255,255,255,0.08);
+  margin-top: 12px;
+  margin-bottom: 24px;
+  min-width: 88px;  /* prevents collapse */
+  opacity: 0;       /* invisible but reserves space */
 }
 
-/* ---------- INNINGS TRACKER ---------- */
-.badge { padding: 8px 12px; }
+/* Inning tracker bar */
 .bar {
   height: 8px;
   background: #0e1627;
@@ -128,71 +159,23 @@ button, .btn {
 }
 .bar > span { display: block; height: 8px; background: #22c55e; }
 
-/* ---------- MOBILE (phones) ---------- */
-@media (max-width: 720px) {
-  .roster-controls { grid-template-columns: 1fr; }
-
-  .card .grid, .player-card__fields { grid-template-columns: 1fr 1fr; }
-
-  .role-row { grid-template-columns: 1fr !important; }
-  .role-row > .cell { margin-bottom: 12px; }
-  .role-row + .role-row { margin-top: 24px; padding-top: 20px; }
-
-  .setup-block { display: flex; flex-direction: column; gap: 18px; }
-
-  .panel h2 + .flex { flex-direction: column; gap: 12px; }
-}
-
-/* ---------- DESKTOP (wider) ---------- */
-@media (min-width: 721px) {
-  .card .grid, .player-card__fields {
-    grid-template-columns: repeat(4, minmax(0,1fr));
-  }
-  .role-row {
-    grid-template-columns: minmax(280px,2fr) 120px 120px auto;
-  }
-}
-
-/* Extra breathing room for rest-day badges under pitcher fields */
-.row .badge {
-  margin-top: 12px;
-  margin-bottom: 24px;
-  display: inline-block;
-}
-
-/* Make catcher spacer badges match the pitcher rest-day badge size */
-.badge.spacer {
-  display: inline-block;
-  padding: 8px 14px;          /* same as real badge */
-  border-radius: 999px;
-  border: 1px solid var(--card-b);
-  margin-top: 12px;
-  margin-bottom: 24px;        /* matches your pill spacing */
-  min-width: 88px;            /* prevents collapse */
-  opacity: 0;                 /* invisible, but reserves space */
-}
-
-@media (min-width: 900px) {
-  .twocol { grid-template-columns: 1fr 1fr; column-gap: 48px; align-items: start; }
-  .twocol > div h3 { margin-top: 0; }
-  .row { align-items: center; }
-  .row select, .row input { height: 42px; } /* consistent control height */
-}
-
-/* Brighter, larger buttons with accent glow (works for all existing buttons) */
+/* =========================================================
+   5) Buttons
+   ========================================================= */
+/* Brighter, larger buttons with accent glow */
 button, .btn, .actions button {
   padding: 12px 18px;
   border-radius: 12px;
   font-weight: 700;
   border: 1px solid var(--accent, #69a6ff);
-  background: rgba(105,166,255,0.18);                 /* fallback */
+  background: rgba(105,166,255,0.18); /* fallback */
   background: color-mix(in oklab, var(--accent) 18%, transparent);
   box-shadow:
     0 0 0 1px rgba(105,166,255,0.28) inset,
     0 8px 20px rgba(105,166,255,0.18);
   transition: background .15s ease, box-shadow .15s ease, transform .05s ease;
+  color: #ffffff; /* default white text */
 }
-
 button:hover, .btn:hover, .actions button:hover {
   background: rgba(105,166,255,0.28);
   background: color-mix(in oklab, var(--accent) 28%, transparent);
@@ -200,46 +183,41 @@ button:hover, .btn:hover, .actions button:hover {
     0 0 0 1px rgba(105,166,255,0.38) inset,
     0 10px 28px rgba(105,166,255,0.25);
 }
+button:active, .btn:active, .actions button:active { transform: translateY(1px); }
 
-button:active, .btn:active, .actions button:active {
-  transform: translateY(1px);
-}
-
-/* 1) Normalize control heights so rows are equal on both sides */
-.row select,
-.row input[type="number"],
-.row input[type="text"] {
-  height: 44px;           /* consistent control height */
-  line-height: 44px;      /* keeps text vertically centered */
-}
-
-/* 2) Give each setup row a consistent minimum height */
-.twocol .row {
-  align-items: center;    /* keep labels centered against controls */
-  min-height: 64px;       /* equalizes pitcher/catcher row height */
-}
-
-/* 3) Make the invisible catcher badge reserve the exact same space */
-.badge.spacer {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--card-b);
-  margin-top: 12px;
-  margin-bottom: 24px;
-  min-width: 88px;
-  opacity: 0;             /* invisible, but holds space */
-}
-
-/* Optional (desktop polish): widen the column gap a bit */
-@media (min-width: 900px) {
-  .twocol { grid-template-columns: 1fr 1fr; column-gap: 48px; }
-}
-
-/* Force white text for these key buttons */
+/* Force white for key action buttons (guards against overrides) */
 #buildBtn,
 #toggleEdit,
-.actions button {
-  color: #ffffff !important;
+.actions button { color: #ffffff !important; }
+
+/* =========================================================
+   6) Responsive
+   ========================================================= */
+/* Mobile (phones) */
+@media (max-width: 720px) {
+  .roster-controls { grid-template-columns: 1fr; }
+  .card .grid, .player-card__fields { grid-template-columns: 1fr 1fr; }
+  .role-row { grid-template-columns: 1fr !important; }
+  .role-row > .cell { margin-bottom: 12px; }
+  .role-row + .role-row { margin-top: 24px; padding-top: 20px; }
+  .setup-block { display: flex; flex-direction: column; gap: 18px; }
+  .panel h2 + .flex { flex-direction: column; gap: 12px; }
 }
 
+/* Desktop (wider) */
+@media (min-width: 721px) {
+  .card .grid, .player-card__fields { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .role-row { grid-template-columns: minmax(280px,2fr) 120px 120px auto; }
+}
+
+/* Larger desktop refinements */
+@media (min-width: 900px) {
+  .twocol {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    align-items: start;
+  }
+  .twocol > div h3 { margin-top: 0; }
+  .row { align-items: center; }
+  .row select, .row input { height: 42px; } /* consistent control height */
+}
