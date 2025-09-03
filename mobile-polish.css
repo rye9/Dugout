@@ -204,3 +204,34 @@ button:hover, .btn:hover, .actions button:hover {
 button:active, .btn:active, .actions button:active {
   transform: translateY(1px);
 }
+
+/* 1) Normalize control heights so rows are equal on both sides */
+.row select,
+.row input[type="number"],
+.row input[type="text"] {
+  height: 44px;           /* consistent control height */
+  line-height: 44px;      /* keeps text vertically centered */
+}
+
+/* 2) Give each setup row a consistent minimum height */
+.twocol .row {
+  align-items: center;    /* keep labels centered against controls */
+  min-height: 64px;       /* equalizes pitcher/catcher row height */
+}
+
+/* 3) Make the invisible catcher badge reserve the exact same space */
+.badge.spacer {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--card-b);
+  margin-top: 12px;
+  margin-bottom: 24px;
+  min-width: 88px;
+  opacity: 0;             /* invisible, but holds space */
+}
+
+/* Optional (desktop polish): widen the column gap a bit */
+@media (min-width: 900px) {
+  .twocol { grid-template-columns: 1fr 1fr; column-gap: 48px; }
+}
