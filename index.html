@@ -336,16 +336,30 @@ function build(){
       }
       return best;
     }
-    // Hard-locked 1B/SS first
-    const specPool = (pos)=>pool().filter(pl=> (pos==='1B'?(pl.primary==='1B'||pl.secondary==='1B'):(pl.primary==='SS'||pl.secondary==='SS')) );
-    for(const pos of ['1B','SS']){
-      const list=specPool(pos);
-      if(list.length){ const id=chooseBest(pos, list); inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
+    // Hard-locked corner/short: 1B, 3B, SS
+    const SPECIALIZED = new Set(['1B','3B','SS']);
+    const specPool = (pos)=>pool().filter(pl => SPECIALIZED.has(pos) && (pl.primary===pos || pl.secondary===pos));
+    
+    for (const pos of ['1B','3B','SS']) {
+      const list = specPool(pos);
+      if (list.length) {
+        const id = chooseBest(pos, list);
+        inning[pos] = id; used.add(id); mins[id] = (mins[id]||0)+1;
+      }
     }
-    // Fill generics with SS after 3B for flow
-    for(const pos of ['2B','3B','SS','CF','LF','RF']){
-      if(inning[pos]) continue;
-      const id=chooseBest(pos, pool()); if(id){ inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
+    // Fill remaining non-specialized spots first
+    for (const pos of ['2B','CF','LF','RF']) {
+      if (inning[pos]) continue;
+      const id = chooseBest(pos, pool());
+      if (id) { inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
+    }
+    
+    // Fallback: if a specialized spot (1B/3B/SS) is still empty (no eligible players),
+    // allow best overall to fill so the plan never breaks.
+    for (const pos of ['1B','3B','SS']) {
+      if (inning[pos]) continue;
+      const id = chooseBest(pos, pool());
+      if (id) { inning[pos]=id; used.add(id); mins[id]=(mins[id]||0)+1; }
     }
     // If special still empty, allow pulls from reservedEH (then recompute EH)
     function pullFromLockedEH(pos, qual){
@@ -360,8 +374,8 @@ function build(){
     }
     let pulled = false;
     pulled = pullFromLockedEH('1B', p=>p.primary==='1B'||p.secondary==='1B') || pulled;
+    pulled = pullFromLockedEH('3B', p=>p.primary==='3B'||p.secondary==='3B') || pulled;
     pulled = pullFromLockedEH('SS', p=>p.primary==='SS'||p.secondary==='SS') || pulled;
-
     // Final EH calc with guaranteed fill
     const remaining = available.map(p=>p.id).filter(id=>!used.has(id));
     if((inn%2)===1){
