@@ -154,11 +154,11 @@ function setup(){
         </select>
       </div>
       <div>
-        <label class="small">Min Defensive Innings</label>
+        <label class="small">Minimum Defensive Innings</label>
         <select id="minTarget">${[1,2,3,4,5,6].map(v=>`<option value="${v}" ${v===4?'selected':''}>${v}</option>`).join('')}</select>
       </div>
       <div>
-        <label class="small">Late Innings</label>
+        <label class="small">Late Inning Strategy</label>
         <select id="lateMode">
           <option value="balanced">Balanced</option>
           <option value="tight" selected>Tight (5–6)</option>
@@ -194,7 +194,7 @@ function drawRoster(){
   const tableWrap = $("#rosterTableWrap"); const cardsWrap = $("#rosterCards");
   tableWrap.innerHTML=''; cardsWrap.innerHTML='';
   const tbl = el('table','table');
-  tbl.innerHTML='<thead><tr><th>#</th><th>Name</th><th>Rank</th><th>Primary</th><th>Secondary</th><th>Avail</th></tr></thead>';
+  tbl.innerHTML='<thead><tr><th>#</th><th>Name</th><th>Rank</th><th>Primary Position</th><th>Secondary Position</th><th>Availability</th></tr></thead>';
   const tb=el('tbody','');
   const posOpts=(val)=>POSITIONS.map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
   const rankOpts=(val)=>Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===val?'selected':''}>${v}</option>`).join('');
@@ -214,10 +214,10 @@ function drawRoster(){
     const c = el('div','card'); c.dataset.id=p.id;
     c.innerHTML = '<h4>#'+p.number+' — '+p.first+'</h4>'
       +'<div class="grid">'
-      +  '<div><label>Rank</label><select data-key="rank">'+Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===(p.rank||1)?'selected':''}>${v}</option>`).join('')+'</select></div>'
-      +  '<div><label>Avail</label><select data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></div>'
-      +  '<div><label>Primary</label><select data-key="primary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.primary?'selected':''}>${v}</option>`).join('')+'</select></div>'
-      +  '<div><label>Secondary</label><select data-key="secondary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.secondary?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +  '<div><label>Player Score</label><select data-key="rank">'+Array.from({length:12},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===(p.rank||1)?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +  '<div><label>Availability</label><select data-key="available"><option value="true" '+(p.available?'selected':'')+'>Available</option><option value="false" '+(!p.available?'selected':'')+'>Out</option></select></div>'
+      +  '<div><label>Primary Position</label><select data-key="primary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.primary?'selected':''}>${v}</option>`).join('')+'</select></div>'
+      +  '<div><label>Secondary Position</label><select data-key="secondary">'+POSITIONS.map(v=>`<option value="${v}" ${v===p.secondary?'selected':''}>${v}</option>`).join('')+'</select></div>'
       +'</div>';
     list.appendChild(c);
   });
