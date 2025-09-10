@@ -58,7 +58,7 @@ input[type=number]{width:64px}
 </head>
 <body>
   <header class="no-print">
-    <h1>Blacksox Dugout — Single Game Strategy (v1.0)</h1>
+    \1
     <div class="actions" id="teamTabs" style="margin-left:auto; display:flex; gap:8px;">
       <button id="teamTab-10U" type="button" class="teamtab active">10U</button>
       <button id="teamTab-12U" type="button" class="teamtab">12U</button>
@@ -139,7 +139,7 @@ input[type=number]{width:64px}
   </main>
 
 <script>
-const PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "Anderson", "primary": "RF", "secondary": "1B", "rank": 9}, {"id": "barlet", "number": 1, "first": "Matias", "last": "Barlet", "primary": "CF", "secondary": "3B", "rank": 2}, {"id": "coates", "number": 22, "first": "Truman", "last": "Coates", "primary": "LF", "secondary": "2B", "rank": 11}, {"id": "cooper", "number": 24, "first": "Landon", "last": "Cooper", "primary": "3B", "secondary": "SS", "rank": 6}, {"id": "farrington", "number": 11, "first": "Luke", "last": "Farrington", "primary": "SS", "secondary": "2B", "rank": 5}, {"id": "foushee", "number": 10, "first": "Beau", "last": "Foush\u00e9e", "primary": "3B", "secondary": "1B", "rank": 4}, {"id": "fowl", "number": 63, "first": "George", "last": "Fowl", "primary": "2B", "secondary": "SS", "rank": 7}, {"id": "goodman", "number": 19, "first": "Bridger", "last": "Goodman", "primary": "RF", "secondary": "2B", "rank": 12}, {"id": "kutac", "number": 13, "first": "Max", "last": "Kutac", "primary": "1B", "secondary": "CF", "rank": 1}, {"id": "reiher", "number": 6, "first": "JJ", "last": "Reiher", "primary": "1B", "secondary": "3B", "rank": 3}, {"id": "stephens", "number": 44, "first": "Julian", "last": "Stephens", "primary": "LF", "secondary": "CF", "rank": 8}, {"id": "turner", "number": 21, "first": "Leighton", "last": "Turner", "primary": "RF", "secondary": "2B", "rank": 10}].map(p=>{p.available=true; return p;});
+let PLAYERS = [{"id": "anderson", "number": 9, "first": "Clifford", "last": "Anderson", "primary": "RF", "secondary": "1B", "rank": 9}, {"id": "barlet", "number": 1, "first": "Matias", "last": "Barlet", "primary": "CF", "secondary": "3B", "rank": 2}, {"id": "coates", "number": 22, "first": "Truman", "last": "Coates", "primary": "LF", "secondary": "2B", "rank": 11}, {"id": "cooper", "number": 24, "first": "Landon", "last": "Cooper", "primary": "3B", "secondary": "SS", "rank": 6}, {"id": "farrington", "number": 11, "first": "Luke", "last": "Farrington", "primary": "SS", "secondary": "2B", "rank": 5}, {"id": "foushee", "number": 10, "first": "Beau", "last": "Foush\u00e9e", "primary": "3B", "secondary": "1B", "rank": 4}, {"id": "fowl", "number": 63, "first": "George", "last": "Fowl", "primary": "2B", "secondary": "SS", "rank": 7}, {"id": "goodman", "number": 19, "first": "Bridger", "last": "Goodman", "primary": "RF", "secondary": "2B", "rank": 12}, {"id": "kutac", "number": 13, "first": "Max", "last": "Kutac", "primary": "1B", "secondary": "CF", "rank": 1}, {"id": "reiher", "number": 6, "first": "JJ", "last": "Reiher", "primary": "1B", "secondary": "3B", "rank": 3}, {"id": "stephens", "number": 44, "first": "Julian", "last": "Stephens", "primary": "LF", "secondary": "CF", "rank": 8}, {"id": "turner", "number": 21, "first": "Leighton", "last": "Turner", "primary": "RF", "secondary": "2B", "rank": 10}].map(p=>{p.available=true; return p;});
 const POSITIONS = ["1B","2B","3B","SS","LF","CF","RF","—"];
 const $ = (sel)=>document.querySelector(sel);
 const el=(t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
@@ -502,145 +502,123 @@ function updateRestBadges(){
 document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ console.error(e); alert('Init error: '+e.message); } });
 </script>
 
+
+
+
 <script>
-window.addEventListener("DOMContentLoaded", function() {
-(function(){
+(function(){ 
   const STORE_KEY = "dugout_two_teams_v1";
   const DEFAULT_TEAM = "10U";
-  const CSV_SEED_12U = [{"num": "24", "name": "Anthony", "primary": "2B", "secondary": "LF", "rank": 6}, {"num": "63", "name": "Jack F", "primary": "3B", "secondary": "1B", "rank": 5}, {"num": "27", "name": "Clark", "primary": "2B", "secondary": "1B", "rank": 9}, {"num": "23", "name": "Nolan", "primary": "CF", "secondary": "LF", "rank": 10}, {"num": "22", "name": "Rowan", "primary": "CF", "secondary": "2B", "rank": 8}, {"num": "77", "name": "Emory", "primary": "RF", "secondary": "LF", "rank": 12}, {"num": "11", "name": "Nicky", "primary": "RF", "secondary": "LF", "rank": 11}, {"num": "21", "name": "Esteban", "primary": "3B", "secondary": "2B", "rank": 7}, {"num": "7", "name": "Manuel", "primary": "SS", "secondary": "3B", "rank": 4}, {"num": "4", "name": "Gray", "primary": "SS", "secondary": "2B", "rank": 2}, {"num": "14", "name": "Jack J", "primary": "SS", "secondary": "2B", "rank": 3}, {"num": "74", "name": "Cole", "primary": "RF", "secondary": "LF", "rank": 13}, {"num": "8", "name": "Wat", "primary": "SS", "secondary": "3B", "rank": 1}];
+  window.__CSV_SEED_12U = [{"num": "24", "name": "Anthony", "primary": "2B", "secondary": "LF", "rank": 6}, {"num": "63", "name": "Jack F", "primary": "3B", "secondary": "1B", "rank": 5}, {"num": "27", "name": "Clark", "primary": "2B", "secondary": "1B", "rank": 9}, {"num": "23", "name": "Nolan", "primary": "CF", "secondary": "LF", "rank": 10}, {"num": "22", "name": "Rowan", "primary": "CF", "secondary": "2B", "rank": 8}, {"num": "77", "name": "Emory", "primary": "RF", "secondary": "LF", "rank": 12}, {"num": "11", "name": "Nicky", "primary": "RF", "secondary": "LF", "rank": 11}, {"num": "21", "name": "Esteban", "primary": "3B", "secondary": "2B", "rank": 7}, {"num": "7", "name": "Manuel", "primary": "SS", "secondary": "3B", "rank": 4}, {"num": "4", "name": "Gray", "primary": "SS", "secondary": "2B", "rank": 2}, {"num": "14", "name": "Jack J", "primary": "SS", "secondary": "2B", "rank": 3}, {"num": "74", "name": "Cole", "primary": "RF", "secondary": "LF", "rank": 13}, {"num": "8", "name": "Wat", "primary": "SS", "secondary": "3B", "rank": 1}];
 
-  function $$(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
-  function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return {}} }
-  function saveStore(data){ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+  function load(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return {}} }
+  function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+  function usable(arr){ return Array.isArray(arr) && arr.length>0; }
 
-  function captureState(){
-    const st = {};
-    try {
-      st.players = (window.PLAYERS || []).map(p=>Object.assign({}, p));
-      st.ctrl = {
+  function capture(){ 
+    const src = (typeof PLAYERS!=="undefined"?PLAYERS:window.PLAYERS)||[];
+    return {
+      players: src.map(p=>Object.assign({}, p)),
+      ctrl: {
         viewMode: document.getElementById('viewMode')?.value,
         minTarget: document.getElementById('minTarget')?.value,
         lateMode: document.getElementById('lateMode')?.value,
         spTarget: document.getElementById('spTarget')?.value,
         rpTarget: document.getElementById('rpTarget')?.value,
         clTarget: document.getElementById('clTarget')?.value
-      };
-      st.lastPlan = window.LAST_PLAN || null;
-    } catch(e){}
-    return st;
+      },
+      lastPlan: window.LAST_PLAN || null
+    }; 
   }
 
-  function makePlayersFromCSV(csvRows, templatePlayers){
-    const base = (templatePlayers && templatePlayers[0]) ? templatePlayers[0] : {};
-    return csvRows.map((r, idx)=>{
-      const p = JSON.parse(JSON.stringify(base || {}));
-      if (!p || typeof p !== 'object') {
-        return {
-          number: r.num || String(idx+1),
-          name: r.name || ("Player " + (idx+1)),
-          primary: r.primary || "",
-          secondary: r.secondary || "",
-          rank: r.rank || (idx+1),
-          active: true
-        };
-      }
-      if ('number' in p) p.number = r.num || p.number || String(idx+1); else p.number = r.num || String(idx+1);
+  function splitName(full){ 
+    const s = (full||"").trim().split(/\s+/); 
+    if (!s.length) return {first:"", last:""};
+    if (s.length===1) return {first:s[0], last:""};
+    return {first:s.slice(0,-1).join(" "), last:s[s.length-1]};
+  }
+
+  function mapCSV(seedRows, templatePlayers){
+    const baseP = (templatePlayers && templatePlayers[0]) ? templatePlayers[0] : { };
+    return seedRows.map((r,i)=>{
+      const p = JSON.parse(JSON.stringify(baseP||{ }));
+      const put=(k,v,fb)=> k in p ? p[k]=v||p[k]||fb : p[k]=v||fb;
+      put('number', r.num, String(i+1));
       if ('num' in p) p.num = r.num || p.num;
-      if ('name' in p) p.name = r.name || p.name || ("Player " + (idx+1)); else p.name = r.name || ("Player " + (idx+1));
-      if ('primary' in p) p.primary = r.primary || p.primary || ""; else p.primary = r.primary || "";
-      if ('secondary' in p) p.secondary = r.secondary || p.secondary || ""; else p.secondary = r.secondary || "";
-      if ('rank' in p) p.rank = r.rank || p.rank || (idx+1); else p.rank = r.rank || (idx+1);
-      if ('active' in p) p.active = (p.active !== false); else p.active = true;
-      ['isPitcher','isCatcher','sp','rp','cl','starter','relief','closer'].forEach(k=>{ if (k in p) p[k] = false; });
+
+      const fullName = r.name || "";
+      const parts = splitName(fullName);
+      if ('first' in p) p.first = parts.first || p.first || "";
+      if ('last' in p) p.last = parts.last || p.last || "";
+      if ('First' in p) p.First = parts.first || p.First || "";
+      if ('Last' in p) p.Last = parts.last || p.Last || "";
+      if ('name' in p) p.name = fullName || p.name || "";
+      if ('player' in p) p.player = fullName || p.player || "";
+      if ('Name' in p) p.Name = fullName || p.Name || "";
+
+      put('primary', r.primary, "");
+      put('secondary', r.secondary, "");
+      put('rank', r.rank, (i+1));
+      if (!('active' in p)) p.active = true;
+      ['isPitcher','isCatcher','sp','rp','cl','starter','relief','closer'].forEach(k=>{ if(k in p) p[k]=false; });
       return p;
     });
   }
 
-  function restoreState(st){
-    if(!st) return;
-    try {
-      if (Array.isArray(st.players)) window.PLAYERS = st.players.map(p=>Object.assign({}, p));
-      if (typeof drawRoster === 'function') drawRoster();
-      if (typeof updateRosterVisibility === 'function') updateRosterVisibility();
-      if (typeof fillSelectors === 'function') fillSelectors();
-
-      const c = st.ctrl || {};
-      if (c.viewMode && document.getElementById('viewMode')) document.getElementById('viewMode').value = c.viewMode;
-      if (c.minTarget && document.getElementById('minTarget')) document.getElementById('minTarget').value = c.minTarget;
-      if (c.lateMode && document.getElementById('lateMode')) document.getElementById('lateMode').value = c.lateMode;
-      if (c.spTarget && document.getElementById('spTarget')) document.getElementById('spTarget').value = c.spTarget;
-      if (c.rpTarget && document.getElementById('rpTarget')) document.getElementById('rpTarget').value = c.rpTarget;
-      if (c.clTarget && document.getElementById('clTarget')) document.getElementById('clTarget').value = c.clTarget;
-
-      if (st.lastPlan && st.lastPlan.plan && typeof render === 'function') {
-        window.LAST_PLAN = st.lastPlan;
-        render(st.lastPlan.plan, st.lastPlan.mins, st.lastPlan.minTarget);
-      }
-    } catch(e){}
+  function restore(st){
+    if (!st || !usable(st.players)) return;
+    try { PLAYERS = st.players.map(p=>Object.assign({}, p)); }
+    catch { window.PLAYERS = st.players.map(p=>Object.assign({}, p)); }
+    if (typeof drawRoster==='function') drawRoster();
+    if (typeof updateRosterVisibility==='function') updateRosterVisibility();
+    if (typeof fillSelectors==='function') fillSelectors();
+    if (typeof build==='function') try{build();}catch{}
+    else if (st.lastPlan && typeof render==='function') { try{ render(st.lastPlan.plan, st.lastPlan.mins, st.lastPlan.minTarget); }catch{} }
   }
 
-  const store = loadStore();
-  if (!store.active) store.active = DEFAULT_TEAM;
-  if (!store.teams) store.teams = {};
-
-  if (!store.teams["10U"]) {
-    store.teams["10U"] = captureState();
-  }
-  if (!store.teams["12U"]) {
-    const base = captureState();
-    base.players = makePlayersFromCSV(CSV_SEED_12U, base.players);
-    base.lastPlan = null;
-    store.teams["12U"] = base;
-  }
-  saveStore(store);
-
-  const tab10 = document.getElementById('teamTab-10U');
-  const tab12 = document.getElementById('teamTab-12U');
-
-  function setActiveTab(team){
-    const s = loadStore();
-    if (s.active && s.teams && s.teams[s.active]) {
-      s.teams[s.active] = captureState();
+  function setActive(team){
+    const s = load(); s.teams = s.teams || { };
+    if (s.active && s.teams[s.active]) {
+      const snap = capture();
+      if (usable(snap.players)) s.teams[s.active] = snap;
     }
-    s.active = team;
-    saveStore(s);
-    [tab10, tab12].forEach(b=>b && b.classList.remove('active'));
-    const btn = document.getElementById('teamTab-' + team);
-    if(btn) btn.classList.add('active');
-    restoreState(s.teams[team]);
+    s.active = team; save(s);
+    ['10U','12U'].forEach(t=>{
+      const b=document.getElementById('teamTab-'+t); if(b) b.classList.toggle('active', t===team);
+    });
+    restore(s.teams[team]);
   }
-  tab10 && (tab10.onclick = ()=> setActiveTab("10U"));
-  tab12 && (tab12.onclick = ()=> setActiveTab("12U"));
 
-  // Fallback: event delegation on the container (covers dynamic/layout edge cases)
-  const tabsWrap = document.getElementById('teamTabs');
-  if (tabsWrap && !tabsWrap.__bound) {
-    tabsWrap.addEventListener('click', function(ev){
-      const btn = ev.target.closest('.teamtab');
-      if (!btn) return;
-      const id = btn.id === 'teamTab-12U' ? '12U' : '10U';
-      if (typeof setActiveTab === 'function') {
-        setActiveTab(id);
-      } else {
-        // Minimal inline fallback if closure-scoped setActiveTab isn't exposed:
-        try {
-          const s = loadStore();
-          if (s.active && s.teams && s.teams[s.active]) { s.teams[s.active] = captureState(); }
-          s.active = id; saveStore(s);
-          [tab10, tab12].forEach(b=>b && b.classList.remove('active'));
-          const tgt = document.getElementById('teamTab-' + id);
-          if (tgt) tgt.classList.add('active');
-          restoreState(s.teams[id]);
-        } catch(e) {}
+  window.__switchTeam = setActive;
+
+  function ready(cb){
+    let tries=0, max=200;
+    const t=setInterval(()=>{
+      const okPlayers=(typeof PLAYERS!=='undefined'||typeof window.PLAYERS!=='undefined');
+      const okFuncs=(typeof drawRoster==='function');
+      if(okPlayers&&okFuncs){ clearInterval(t); cb(); }
+      if(++tries>max){ clearInterval(t); cb(); }
+    },50);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ready(()=>{
+      const s = load(); s.teams = s.teams || {}; if(!s.active) s.active=DEFAULT_TEAM;
+      if (!s.teams["10U"] || !usable(s.teams["10U"].players)) {
+        const snap10 = capture(); if (usable(snap10.players)) s.teams["10U"]=snap10;
       }
-    }, false);
-    tabsWrap.__bound = true;
-  }
-
-
-  setTimeout(()=>{ setActiveTab(loadStore().active || DEFAULT_TEAM); }, 0);
+      if (!s.teams["12U"]) {
+        const snap = capture(); 
+        const players12 = mapCSV(window.__CSV_SEED_12U||[], snap.players);
+        s.teams["12U"] = { players: players12, ctrl: snap.ctrl, lastPlan: null };
+      }
+      save(s);
+      const b10=document.getElementById('teamTab-10U'); const b12=document.getElementById('teamTab-12U');
+      if(b10) b10.onclick=()=>setActive('10U');
+      if(b12) b12.onclick=()=>setActive('12U');
+    });
+  });
 })();
-});
 </script>
 
 </body></html>
