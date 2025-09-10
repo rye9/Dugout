@@ -7,11 +7,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Blacksox Dugout — Single Game Strategy (v1.0)</title>
   <style>
-
-.teamtab{background:var(--panel);color:var(--text);border:1px solid var(--grid);padding:8px 10px;border-radius:6px;cursor:pointer}
-.teamtab.active{border-color:var(--accent);color:#fff}
-
-
 :root{--bg:#0b1220;--panel:#111a2b;--text:#e7edf6;--muted:#9bb0c9;--accent:#69a6ff;--grid:#2a3a55;
       --good:#22c55e; --warn:#facc15; --bad:#fb923c}
 *{box-sizing:border-box}html,body{height:100%}
@@ -53,15 +48,20 @@ input[type=number]{width:64px}
   header,.no-print,.print-hide{display:none !important}
   .print-only{display:block}
 }
-  </style>
+  
+
+.teamtab{background:var(--panel);color:var(--text);border:1px solid var(--grid);padding:8px 10px;border-radius:6px;cursor:pointer}
+.teamtab.active{border-color:var(--accent);color:#fff}
+
+</style>
   <link rel="stylesheet" href="mobile-polish.css">
 </head>
 <body>
   <header class="no-print">
-    \1
+    <h1>Blacksox Dugout — Single Game Strategy (v1.0)</h1>
     <div class="actions" id="teamTabs" style="margin-left:auto; display:flex; gap:8px;">
-      <button id="teamTab-10U" type="button" class="teamtab active">10U</button>
-      <button id="teamTab-12U" type="button" class="teamtab">12U</button>
+      <button id="teamTab-10U" type="button" class="teamtab active" onclick="window.__switchTeam && window.__switchTeam('10U')">10U</button>
+      <button id="teamTab-12U" type="button" class="teamtab" onclick="window.__switchTeam && window.__switchTeam('12U')">12U</button>
     </div>
 
     <div class="actions">
@@ -502,121 +502,85 @@ function updateRestBadges(){
 document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ console.error(e); alert('Init error: '+e.message); } });
 </script>
 
-
-
-
 <script>
-(function(){ 
-  const STORE_KEY = "dugout_two_teams_v1";
-  const DEFAULT_TEAM = "10U";
-  window.__CSV_SEED_12U = [{"num": "24", "name": "Anthony", "primary": "2B", "secondary": "LF", "rank": 6}, {"num": "63", "name": "Jack F", "primary": "3B", "secondary": "1B", "rank": 5}, {"num": "27", "name": "Clark", "primary": "2B", "secondary": "1B", "rank": 9}, {"num": "23", "name": "Nolan", "primary": "CF", "secondary": "LF", "rank": 10}, {"num": "22", "name": "Rowan", "primary": "CF", "secondary": "2B", "rank": 8}, {"num": "77", "name": "Emory", "primary": "RF", "secondary": "LF", "rank": 12}, {"num": "11", "name": "Nicky", "primary": "RF", "secondary": "LF", "rank": 11}, {"num": "21", "name": "Esteban", "primary": "3B", "secondary": "2B", "rank": 7}, {"num": "7", "name": "Manuel", "primary": "SS", "secondary": "3B", "rank": 4}, {"num": "4", "name": "Gray", "primary": "SS", "secondary": "2B", "rank": 2}, {"num": "14", "name": "Jack J", "primary": "SS", "secondary": "2B", "rank": 3}, {"num": "74", "name": "Cole", "primary": "RF", "secondary": "LF", "rank": 13}, {"num": "8", "name": "Wat", "primary": "SS", "secondary": "3B", "rank": 1}];
-
-  function load(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return {}} }
-  function save(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
-  function usable(arr){ return Array.isArray(arr) && arr.length>0; }
-
-  function capture(){ 
-    const src = (typeof PLAYERS!=="undefined"?PLAYERS:window.PLAYERS)||[];
-    return {
-      players: src.map(p=>Object.assign({}, p)),
-      ctrl: {
-        viewMode: document.getElementById('viewMode')?.value,
-        minTarget: document.getElementById('minTarget')?.value,
-        lateMode: document.getElementById('lateMode')?.value,
-        spTarget: document.getElementById('spTarget')?.value,
-        rpTarget: document.getElementById('rpTarget')?.value,
-        clTarget: document.getElementById('clTarget')?.value
-      },
-      lastPlan: window.LAST_PLAN || null
-    }; 
+(function(){
+  const CSV_12U = [{"number": "24", "name": "Anthony", "primary": "2B", "secondary": "LF", "rank": "6"}, {"number": "63", "name": "Jack F", "primary": "3B", "secondary": "1B", "rank": "5"}, {"number": "27", "name": "Clark", "primary": "2B", "secondary": "1B", "rank": "9"}, {"number": "23", "name": "Nolan", "primary": "CF", "secondary": "LF", "rank": "10"}, {"number": "22", "name": "Rowan", "primary": "CF", "secondary": "2B", "rank": "8"}, {"number": "77", "name": "Emory", "primary": "RF", "secondary": "LF", "rank": "12"}, {"number": "11", "name": "Nicky", "primary": "RF", "secondary": "LF", "rank": "11"}, {"number": "21", "name": "Esteban", "primary": "3B", "secondary": "2B", "rank": "7"}, {"number": "7", "name": "Manuel", "primary": "SS", "secondary": "3B", "rank": "4"}, {"number": "4", "name": "Gray", "primary": "SS", "secondary": "2B", "rank": "2"}, {"number": "14", "name": "Jack J", "primary": "SS", "secondary": "2B", "rank": "3"}, {"number": "74", "name": "Cole", "primary": "RF", "secondary": "LF", "rank": "13"}, {"number": "8", "name": "Wat", "primary": "SS", "secondary": "3B", "rank": "1"}];
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+  function splitName(full){
+    const parts = (full||'').trim().split(/\s+/);
+    if (parts.length<=1) return {first:parts[0]||'', last:''};
+    return {first:parts.slice(0,-1).join(' '), last:parts[parts.length-1]};
   }
-
-  function splitName(full){ 
-    const s = (full||"").trim().split(/\s+/); 
-    if (!s.length) return {first:"", last:""};
-    if (s.length===1) return {first:s[0], last:""};
-    return {first:s.slice(0,-1).join(" "), last:s[s.length-1]};
-  }
-
-  function mapCSV(seedRows, templatePlayers){
-    const baseP = (templatePlayers && templatePlayers[0]) ? templatePlayers[0] : { };
-    return seedRows.map((r,i)=>{
-      const p = JSON.parse(JSON.stringify(baseP||{ }));
-      const put=(k,v,fb)=> k in p ? p[k]=v||p[k]||fb : p[k]=v||fb;
-      put('number', r.num, String(i+1));
-      if ('num' in p) p.num = r.num || p.num;
-
-      const fullName = r.name || "";
-      const parts = splitName(fullName);
-      if ('first' in p) p.first = parts.first || p.first || "";
-      if ('last' in p) p.last = parts.last || p.last || "";
-      if ('First' in p) p.First = parts.first || p.First || "";
-      if ('Last' in p) p.Last = parts.last || p.Last || "";
-      if ('name' in p) p.name = fullName || p.name || "";
-      if ('player' in p) p.player = fullName || p.player || "";
-      if ('Name' in p) p.Name = fullName || p.Name || "";
-
-      put('primary', r.primary, "");
-      put('secondary', r.secondary, "");
-      put('rank', r.rank, (i+1));
-      if (!('active' in p)) p.active = true;
-      ['isPitcher','isCatcher','sp','rp','cl','starter','relief','closer'].forEach(k=>{ if(k in p) p[k]=false; });
-      return p;
+  function toInt(x, fb){ const n = parseInt(x,10); return isNaN(n)?fb:n; }
+  let SNAP_10U = null;
+  function csvPlayersStrict(){ 
+    return CSV_12U.map((r,i)=>{
+      const nm = splitName(r.name || r.Name);
+      const num = toInt(r.number || r.num || r['#'], i+1);
+      return {
+        id: String(num || (i+1)),
+        number: num || (i+1),
+        first: nm.first,
+        last: nm.last,
+        name: r.name || r.Name,
+        primary: r.primary || r.Primary || '—',
+        secondary: r.secondary || r.Secondary || '—',
+        rank: toInt(r.rank || r.order || r.priority, i+1),
+        available: true
+      };
     });
   }
-
-  function restore(st){
-    if (!st || !usable(st.players)) return;
-    try { PLAYERS = st.players.map(p=>Object.assign({}, p)); }
-    catch { window.PLAYERS = st.players.map(p=>Object.assign({}, p)); }
+  function getMaxRank(){ 
+    const ranks = CSV_12U.map(r=>toInt(r.rank || r.order || r.priority,0));
+    const maxCSV = Math.max(CSV_12U.length, ...ranks, 13);
+    const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
+    const maxData = Math.max(list.length||0, ...list.map(p=>toInt(p.rank,0)), 1);
+    return Math.max(maxCSV, maxData);
+  }
+  window.getMaxRank = getMaxRank;
+  function expandRanks(){ 
+    const table = document.querySelector('table.table');
+    if (!table) return;
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+    const maxR = getMaxRank();
+    const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
+    rows.forEach((tr, idx)=>{
+      const sel = tr.querySelector('td:nth-child(3) select[data-key="rank"]');
+      if (!sel) return;
+      let last = sel.options.length ? parseInt(sel.options[sel.options.length-1].textContent,10) || 0 : 0;
+      for (let n=last+1; n<=maxR; n++){ const o=document.createElement('option'); o.value=String(n); o.textContent=String(n); sel.appendChild(o); }
+      const desired = list[idx] && toInt(list[idx].rank,0);
+      if (desired){ 
+        sel.value = String(desired);
+        if (sel.value !== String(desired)){
+          const o=document.createElement('option'); o.value=String(desired); o.textContent=String(desired); sel.appendChild(o); sel.value=String(desired);
+        }
+      }
+    });
+  }
+  function setActive(team){
+    try{ if(!SNAP_10U) SNAP_10U = clone((typeof PLAYERS!=='undefined'?PLAYERS:window.PLAYERS)||[]); }catch(e){}
+    if (team==='10U' && SNAP_10U){
+      try { PLAYERS = clone(SNAP_10U); } catch(e) { window.PLAYERS = clone(SNAP_10U); }
+    } else if (team==='12U'){
+      const strict = csvPlayersStrict();
+      try { PLAYERS = strict; } catch(e) { window.PLAYERS = strict; }
+    }
+    document.getElementById('teamTab-10U')?.classList.toggle('active', team==='10U');
+    document.getElementById('teamTab-12U')?.classList.toggle('active', team==='12U');
     if (typeof drawRoster==='function') drawRoster();
     if (typeof updateRosterVisibility==='function') updateRosterVisibility();
     if (typeof fillSelectors==='function') fillSelectors();
-    if (typeof build==='function') try{build();}catch{}
-    else if (st.lastPlan && typeof render==='function') { try{ render(st.lastPlan.plan, st.lastPlan.mins, st.lastPlan.minTarget); }catch{} }
+    try { expandRanks(); } catch(e){}
   }
-
-  function setActive(team){
-    const s = load(); s.teams = s.teams || { };
-    if (s.active && s.teams[s.active]) {
-      const snap = capture();
-      if (usable(snap.players)) s.teams[s.active] = snap;
-    }
-    s.active = team; save(s);
-    ['10U','12U'].forEach(t=>{
-      const b=document.getElementById('teamTab-'+t); if(b) b.classList.toggle('active', t===team);
-    });
-    restore(s.teams[team]);
-  }
-
   window.__switchTeam = setActive;
-
-  function ready(cb){
-    let tries=0, max=200;
-    const t=setInterval(()=>{
-      const okPlayers=(typeof PLAYERS!=='undefined'||typeof window.PLAYERS!=='undefined');
-      const okFuncs=(typeof drawRoster==='function');
-      if(okPlayers&&okFuncs){ clearInterval(t); cb(); }
-      if(++tries>max){ clearInterval(t); cb(); }
-    },50);
-  }
-
   document.addEventListener('DOMContentLoaded', function(){
-    ready(()=>{
-      const s = load(); s.teams = s.teams || {}; if(!s.active) s.active=DEFAULT_TEAM;
-      if (!s.teams["10U"] || !usable(s.teams["10U"].players)) {
-        const snap10 = capture(); if (usable(snap10.players)) s.teams["10U"]=snap10;
+    let tries=0, t=setInterval(()=>{
+      const ok = (typeof drawRoster==='function') && ((typeof PLAYERS!=='undefined')||(typeof window.PLAYERS!=='undefined'));
+      if (ok || ++tries>200) { clearInterval(t);
+        try { expandRanks(); } catch(e){}
       }
-      if (!s.teams["12U"]) {
-        const snap = capture(); 
-        const players12 = mapCSV(window.__CSV_SEED_12U||[], snap.players);
-        s.teams["12U"] = { players: players12, ctrl: snap.ctrl, lastPlan: null };
-      }
-      save(s);
-      const b10=document.getElementById('teamTab-10U'); const b12=document.getElementById('teamTab-12U');
-      if(b10) b10.onclick=()=>setActive('10U');
-      if(b12) b12.onclick=()=>setActive('12U');
-    });
+    }, 50);
   });
 })();
 </script>
