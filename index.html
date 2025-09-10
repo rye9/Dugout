@@ -584,5 +584,43 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
   });
 })();
 </script>
+<script>
+(function(){
+  function getMaxRank(){
+    const list = (typeof PLAYERS!=="undefined"?PLAYERS:(window.PLAYERS||[])) || [];
+    const maxData = Math.max(list.length||0, ...list.map(p=>parseInt(p.rank,10)||0), 0);
+    return Math.max(13, maxData);
+  }
+  function expandRanks(){
+    const table = document.querySelector('table.table'); if (!table) return;
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+    const list = (typeof PLAYERS!=="undefined"?PLAYERS:(window.PLAYERS||[])) || [];
+    const maxR = getMaxRank();
+    rows.forEach((tr, idx) => {
+      const sel = tr.querySelector('td:nth-child(3) select[data-key="rank"]'); if (!sel) return;
+      let last = sel.options.length ? parseInt(sel.options[sel.options.length-1].textContent,10)||0 : 0;
+      for (let n=last+1; n<=maxR; n++){ const o=document.createElement('option'); o.value=String(n); o.textContent=String(n); sel.appendChild(o); }
+      const desired = list[idx] && (parseInt(list[idx].rank,10)||0);
+      if (desired){
+        sel.value = String(desired);
+        if (sel.value !== String(desired)){ const o=document.createElement('option'); o.value=String(desired); o.textContent=String(desired); sel.appendChild(o); sel.value=String(desired); }
+      }
+    });
+  }
+  // Run after your app renders, and also hook into your team switcher if present
+  document.addEventListener('DOMContentLoaded', function(){
+    let tries=0, t=setInterval(()=>{ 
+      const ok = (typeof drawRoster==='function') && ((typeof PLAYERS!=='undefined')||(typeof window.PLAYERS!=='undefined'));
+      if (ok || ++tries>200){ clearInterval(t); try{ expandRanks(); }catch(e){} }
+    }, 50);
+  });
+  // If you have window.__switchTeam, wrap it to re-expand after tab switches
+  if (window.__switchTeam && !window.__switchTeam__wrapped){
+    const orig = window.__switchTeam;
+    window.__switchTeam__wrapped = true;
+    window.__switchTeam = function(team){ const r = orig(team); try{ expandRanks(); }catch(e){} return r; };
+  }
+})();
+</script>
 
 </body></html>
