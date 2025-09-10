@@ -60,8 +60,8 @@ input[type=number]{width:64px}
   <header class="no-print">
     <h1>Blacksox Dugout — Single Game Strategy (v1.0)</h1>
     <div class="actions" id="teamTabs" style="margin-left:auto; display:flex; gap:8px;">
-      <button id="teamTab-10U" class="teamtab active">10U</button>
-      <button id="teamTab-12U" class="teamtab">12U</button>
+      <button id="teamTab-10U" type="button" class="teamtab active">10U</button>
+      <button id="teamTab-12U" type="button" class="teamtab">12U</button>
     </div>
 
     <div class="actions">
@@ -503,6 +503,7 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
 </script>
 
 <script>
+window.addEventListener("DOMContentLoaded", function() {
 (function(){
   const STORE_KEY = "dugout_two_teams_v1";
   const DEFAULT_TEAM = "10U";
@@ -611,8 +612,35 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
   tab10 && (tab10.onclick = ()=> setActiveTab("10U"));
   tab12 && (tab12.onclick = ()=> setActiveTab("12U"));
 
+  // Fallback: event delegation on the container (covers dynamic/layout edge cases)
+  const tabsWrap = document.getElementById('teamTabs');
+  if (tabsWrap && !tabsWrap.__bound) {
+    tabsWrap.addEventListener('click', function(ev){
+      const btn = ev.target.closest('.teamtab');
+      if (!btn) return;
+      const id = btn.id === 'teamTab-12U' ? '12U' : '10U';
+      if (typeof setActiveTab === 'function') {
+        setActiveTab(id);
+      } else {
+        // Minimal inline fallback if closure-scoped setActiveTab isn't exposed:
+        try {
+          const s = loadStore();
+          if (s.active && s.teams && s.teams[s.active]) { s.teams[s.active] = captureState(); }
+          s.active = id; saveStore(s);
+          [tab10, tab12].forEach(b=>b && b.classList.remove('active'));
+          const tgt = document.getElementById('teamTab-' + id);
+          if (tgt) tgt.classList.add('active');
+          restoreState(s.teams[id]);
+        } catch(e) {}
+      }
+    }, false);
+    tabsWrap.__bound = true;
+  }
+
+
   setTimeout(()=>{ setActiveTab(loadStore().active || DEFAULT_TEAM); }, 0);
 })();
+});
 </script>
 
 </body></html>
