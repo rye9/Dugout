@@ -632,4 +632,58 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+<script>
+(function(){
+  function ensureRankOptionsAndSet(num, desired){
+    const rows = Array.from(document.querySelectorAll('table.table tbody tr'));
+    for(const tr of rows){
+      const td = tr.querySelector('td:nth-child(1)');
+      if(!td) continue;
+      const m = (td.textContent||'').match(/\d+/);
+      if(!m) continue;
+      if(m[0] !== String(num)) continue;
+      const sel = tr.querySelector('td:nth-child(3) select[data-key="rank"]');
+      if(!sel) continue;
+      if(!Array.from(sel.options).some(o=>o.value===String(desired))){
+        const o = document.createElement('option');
+        o.value = String(desired);
+        o.textContent = String(desired);
+        sel.appendChild(o);
+      }
+      sel.value = String(desired);
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+      return true;
+    }
+    return false;
+  }
+  function enforceAllRanksFromPlayers(){
+    try{
+      const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
+      list.forEach(p => ensureRankOptionsAndSet(p.number, p.rank));
+    }catch(e){}
+  }
+  window.__enforce12URanksStrong = function(){
+    let tries = 0;
+    const max = 10;
+    const t = setInterval(()=>{
+      tries++;
+      enforceAllRanksFromPlayers();
+      if(tries>=max) clearInterval(t);
+    }, 120);
+  };
+  const oldSwitch = window.__switchTeam;
+  if(typeof oldSwitch === 'function'){
+    window.__switchTeam = function(team){
+      const r = oldSwitch.apply(this, arguments);
+      if(team==='12U'){
+        try{ enforceAllRanksFromPlayers(); }catch(e){}
+        try{ window.__enforce12URanksStrong(); }catch(e){}
+      }
+      return r;
+    };
+  }
+})();
+</script>
+
 </body></html>
