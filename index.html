@@ -686,4 +686,71 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+<script>
+(function(){
+  function ensureRankOptionsAndSet(num, desired){
+    const rows = Array.from(document.querySelectorAll('table.table tbody tr'));
+    for(const tr of rows){
+      const td = tr.querySelector('td:nth-child(1)');
+      if(!td) continue;
+      const m = (td.textContent||'').match(/\d+/);
+      if(!m) continue;
+      if(m[0] !== String(num)) continue;
+      const sel = tr.querySelector('td:nth-child(3) select[data-key="rank"]');
+      if(!sel) continue;
+      let maxOpt = 0;
+      Array.from(sel.options).forEach(o=>{ maxOpt = Math.max(maxOpt, parseInt(o.value||o.textContent,10)||0) });
+      for(let k=maxOpt+1; k<=desired; k++){
+        const o = document.createElement('option'); o.value=String(k); o.textContent=String(k); sel.appendChild(o);
+      }
+      if(!Array.from(sel.options).some(o=>o.value===String(desired))){
+        const o = document.createElement('option'); o.value = String(desired); o.textContent = String(desired); sel.appendChild(o);
+      }
+      sel.value = String(desired);
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+      return true;
+    }
+    return false;
+  }
+
+  function enforceFromPlayers(){
+    try{
+      const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
+      list.forEach(p => ensureRankOptionsAndSet(p.number, p.rank));
+    }catch(e){}
+  }
+
+  function observeRosterFor(durationMs){
+    const tbody = document.querySelector('table.table tbody');
+    if(!tbody) return;
+    const obs = new MutationObserver(()=>{ enforceFromPlayers(); });
+    obs.observe(tbody, {childList:true, subtree:true, characterData:true});
+    enforceFromPlayers();
+    setTimeout(()=>{ try{ obs.disconnect(); }catch(e){} }, durationMs||5000);
+  }
+
+  const oldSwitch = window.__switchTeam;
+  if(typeof oldSwitch === 'function'){
+    window.__switchTeam = function(team){
+      const r = oldSwitch.apply(this, arguments);
+      if(team==='12U'){
+        enforceFromPlayers();
+        observeRosterFor(6000);
+        setTimeout(enforceFromPlayers, 150);
+        setTimeout(enforceFromPlayers, 400);
+        setTimeout(enforceFromPlayers, 800);
+      }
+      return r;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    if(document.getElementById('teamTab-12U')?.classList.contains('active')){
+      observeRosterFor(6000);
+    }
+  });
+})();
+</script>
+
 </body></html>
