@@ -504,123 +504,106 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
 
 <script>
 (function(){
-  const CSV_12U = [{"number": "24", "name": "Anthony", "primary": "2B", "secondary": "LF", "rank": "6"}, {"number": "63", "name": "Jack F", "primary": "3B", "secondary": "1B", "rank": "5"}, {"number": "27", "name": "Clark", "primary": "2B", "secondary": "1B", "rank": "9"}, {"number": "23", "name": "Nolan", "primary": "CF", "secondary": "LF", "rank": "10"}, {"number": "22", "name": "Rowan", "primary": "CF", "secondary": "2B", "rank": "8"}, {"number": "77", "name": "Emory", "primary": "RF", "secondary": "LF", "rank": "12"}, {"number": "11", "name": "Nicky", "primary": "RF", "secondary": "LF", "rank": "11"}, {"number": "21", "name": "Esteban", "primary": "3B", "secondary": "2B", "rank": "7"}, {"number": "7", "name": "Manuel", "primary": "SS", "secondary": "3B", "rank": "4"}, {"number": "4", "name": "Gray", "primary": "SS", "secondary": "2B", "rank": "2"}, {"number": "14", "name": "Jack J", "primary": "SS", "secondary": "2B", "rank": "3"}, {"number": "74", "name": "Cole", "primary": "RF", "secondary": "LF", "rank": "13"}, {"number": "8", "name": "Wat", "primary": "SS", "secondary": "3B", "rank": "1"}];
+  const CSV_12U = [{"Number": 24, "Name": "Anthony", "Primary": "2B", "Secondary": "LF", "Rank": 6}, {"Number": 63, "Name": "Jack F", "Primary": "3B", "Secondary": "1B", "Rank": 5}, {"Number": 27, "Name": "Clark", "Primary": "2B", "Secondary": "1B", "Rank": 9}, {"Number": 23, "Name": "Nolan", "Primary": "CF", "Secondary": "LF", "Rank": 10}, {"Number": 22, "Name": "Rowan", "Primary": "CF", "Secondary": "2B", "Rank": 8}, {"Number": 77, "Name": "Emory", "Primary": "RF", "Secondary": "LF", "Rank": 12}, {"Number": 11, "Name": "Nicky", "Primary": "RF", "Secondary": "LF", "Rank": 11}, {"Number": 21, "Name": "Esteban", "Primary": "3B", "Secondary": "2B", "Rank": 7}, {"Number": 7, "Name": "Manuel", "Primary": "SS", "Secondary": "3B", "Rank": 4}, {"Number": 4, "Name": "Gray", "Primary": "SS", "Secondary": "2B", "Rank": 2}, {"Number": 14, "Name": "Jack J", "Primary": "SS", "Secondary": "2B", "Rank": 3}, {"Number": 74, "Name": "Cole", "Primary": "RF", "Secondary": "LF", "Rank": 13}, {"Number": 8, "Name": "Wat", "Primary": "SS", "Secondary": "3B", "Rank": 1}];
+  const ranks10U = {"21": 5, "6": 3, "13": 1, "24": 4, "1": 2, "63": 6, "9": 9, "10": 7, "11": 8, "19": 11, "22": 12, "44": 10};
 
-  // --- Utilities ---
+  // Always clear storage on page load (fresh start)
+  try { localStorage.clear(); } catch(e) {}
+
   function clone(o){ return JSON.parse(JSON.stringify(o)); }
   function toInt(x, fb){ const n = parseInt(x,10); return isNaN(n)?fb:n; }
+
+  function apply10URanks(list){
+    (list||[]).forEach(p=>{
+      const rk = ranks10U[String(p.number)];
+      if (rk) p.rank = rk;
+    });
+  }
+
   function splitName(full){
     const parts = (full||'').trim().split(/\s+/);
     if (parts.length<=1) return {first:parts[0]||'', last:''};
     return {first:parts.slice(0,-1).join(' '), last:parts[parts.length-1]};
   }
-
-  // Build PLAYERS strictly from CSV (1:1, including ranks like 13)
   function csvPlayersStrict(){
     return (CSV_12U||[]).map((r,i)=>{
-      const nm = splitName(r.name || r.Name);
-      const num = toInt(r.number || r.num || r['#'], i+1);
+      const nm = splitName(r.Name || r.name);
+      const num = toInt(r.Number || r.number || r['#'], i+1);
       return {
         id: String(num || (i+1)),
         number: num || (i+1),
         first: nm.first,
         last: nm.last,
-        name: r.name || r.Name,
-        primary: r.primary || r.Primary || '—',
-        secondary: r.secondary || r.Secondary || '—',
-        rank: toInt(r.rank || r.order || r.priority, i+1),
+        name: (r.Name || r.name)||'',
+        primary: r.Primary || r.primary || '—',
+        secondary: r.Secondary || r.secondary || '—',
+        rank: toInt(r.Rank || r.rank || r.order || r.priority, i+1),
         available: true
       };
     });
   }
 
-  // Max rank must include CSV ranks and at least 13
   function getMaxRank(){
-    const ranks = (CSV_12U||[]).map(r=>toInt(r.rank || r.order || r.priority,0));
-    const maxCSV = Math.max((CSV_12U||[]).length, ...ranks, 13);
+    const ranks = (CSV_12U||[]).map(r=>toInt(r.Rank ?? r.rank ?? r.order ?? r.priority,0));
     const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
-    const maxData = Math.max(list.length||0, ...list.map(p=>toInt(p.rank,0)), 1);
-    return Math.max(maxCSV, maxData);
-  }
-  window.getMaxRank = getMaxRank;
-
-  // Locate roster table (try by class, else by header text)
-  function findRosterTable(){
-    let t = document.querySelector('table.table');
-    if (t) return t;
-    const tables = Array.from(document.querySelectorAll('table'));
-    return tables.find(tt=>{
-      const head = (tt.tHead && tt.tHead.textContent) || "";
-      return /#\s*Name\s*Rank\s*Primary\s*Secondary/i.test(head);
-    });
+    const maxData = Math.max(list.length||0, ...list.map(p=>toInt(p.rank,0)), 0);
+    return Math.max(13, (CSV_12U||[]).length, ...ranks, maxData);
   }
 
-  // Expand rank selects and set values without firing change events
   function expandAndApplyRanks(){
-    const table = findRosterTable();
-    if (!table) return;
-    const rows = Array.from(table.querySelectorAll('tbody tr'));
-    const list = (typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
-    const maxR = getMaxRank();
-    rows.forEach((tr, idx)=>{
-      const sel = tr.querySelector('td:nth-child(3) select[data-key="rank"]') || tr.querySelector('select[name="rank"], select[data-key="rank"]');
-      if (!sel) return;
-      let last = sel.options.length ? parseInt(sel.options[sel.options.length-1].textContent,10) || 0 : 0;
-      for (let n=last+1; n<=maxR; n++){ const o=document.createElement('option'); o.value=String(n); o.textContent=String(n); sel.appendChild(o); }
-      const desired = list[idx] && toInt(list[idx].rank,0);
-      if (desired){
-        sel.value = String(desired);
-        if (sel.value !== String(desired)){ const o=document.createElement('option'); o.value=String(desired); o.textContent=String(desired); sel.appendChild(o); sel.value=String(desired); }
+    const table=document.querySelector('table.table'); if(!table) return;
+    const rows=Array.from(table.querySelectorAll('tbody tr'));
+    const list=(typeof PLAYERS!=='undefined'?PLAYERS:(window.PLAYERS||[]))||[];
+    const byNum=new Map(list.map(p=>[String(p.number), p]));
+    const maxR=getMaxRank();
+    rows.forEach((tr)=>{
+      const td=tr.querySelector('td:nth-child(1)');
+      const m=(td && td.textContent||'').match(/\d+/);
+      const num=m?m[0]:null;
+      const sel=tr.querySelector('td:nth-child(3) select[data-key="rank"]');
+      if(!sel) return;
+      let last=sel.options.length ? parseInt(sel.options[sel.options.length-1].textContent,10)||0 : 0;
+      for(let n=last+1;n<=maxR;n++){ const o=document.createElement('option'); o.value=String(n); o.textContent=String(n); sel.appendChild(o); }
+      if(num && byNum.has(String(num))){
+        const desired=toInt(byNum.get(String(num)).rank,0);
+        if(desired){ sel.value=String(desired);
+          if(sel.value!==String(desired)){ const o=document.createElement('option'); o.value=String(desired); o.textContent=String(desired); sel.appendChild(o); sel.value=String(desired); }
+        }
       }
     });
   }
 
-  // Keep 10U snapshot in-memory (per page load)
-  let SNAP_10U = null;
-
-  // Wrap drawRoster once so our expansion always runs after renders
-  (function wrapOnce(){
-    if (window.__rankWrapApplied) return;
-    window.__rankWrapApplied = true;
-    const orig = window.drawRoster;
-    if (typeof orig === 'function'){
-      window.drawRoster = function(){
-        const r = orig.apply(this, arguments);
-        try{ expandAndApplyRanks(); }catch(e){}
-        return r;
-      };
-    }
-  })();
-
-  // Team switcher
+  let SNAP_10U=null;
   function setActive(team){
-    try{ if(!SNAP_10U) SNAP_10U = clone((typeof PLAYERS!=='undefined'?PLAYERS:window.PLAYERS)||[]); }catch(e){}
-    if (team==='10U' && SNAP_10U){
-      try { PLAYERS = clone(SNAP_10U); } catch(e) { window.PLAYERS = clone(SNAP_10U); }
-    } else if (team==='12U'){
-      const strict = csvPlayersStrict();
-      try { PLAYERS = strict; } catch(e) { window.PLAYERS = strict; }
+    try{ if(!SNAP_10U) { SNAP_10U = clone((typeof PLAYERS!=='undefined'?PLAYERS:window.PLAYERS)||[]); apply10URanks(SNAP_10U);} }catch(e){}
+    if(team==='10U' && SNAP_10U){
+      let tmp=clone(SNAP_10U); apply10URanks(tmp);
+      try{ PLAYERS=tmp;}catch(e){window.PLAYERS=tmp;}
+    } else if(team==='12U'){
+      let strict=csvPlayersStrict();
+      try{ PLAYERS=strict;}catch(e){window.PLAYERS=strict;}
     }
     document.getElementById('teamTab-10U')?.classList.toggle('active', team==='10U');
     document.getElementById('teamTab-12U')?.classList.toggle('active', team==='12U');
-
-    if (typeof drawRoster==='function') drawRoster();
-    if (typeof updateRosterVisibility==='function') updateRosterVisibility();
-    if (typeof fillSelectors==='function') fillSelectors();
-
-    try { expandAndApplyRanks(); } catch(e){}
+    if(typeof drawRoster==='function') drawRoster();
+    if(typeof updateRosterVisibility==='function') updateRosterVisibility();
+    if(typeof fillSelectors==='function') fillSelectors();
+    try{ expandAndApplyRanks(); }catch(e){}
   }
-  window.__switchTeam = setActive;
+  window.__switchTeam=setActive;
 
-  // Initialize on ready
+  (function wrapOnce(){ if(window.__rankWrapApplied) return; window.__rankWrapApplied=true;
+    const orig=window.drawRoster;
+    if(typeof orig==='function'){ window.drawRoster=function(){ const r=orig.apply(this, arguments);
+      try{ expandAndApplyRanks(); }catch(e){} return r; }; }
+  })();
+
   document.addEventListener('DOMContentLoaded', function(){
+    try{ apply10URanks(PLAYERS); }catch(e){}
     let tries=0, t=setInterval(()=>{
-      const ok = (typeof drawRoster==='function') && ((typeof PLAYERS!=='undefined')||(typeof window.PLAYERS!=='undefined'));
-      if (ok || ++tries>200) {
-        clearInterval(t);
-        try { expandAndApplyRanks(); } catch(e){}
-      }
-    }, 50);
+      const ok=(typeof drawRoster==='function') && ((typeof PLAYERS!=='undefined')||(typeof window.PLAYERS!=='undefined'));
+      if(ok || ++tries>200){ clearInterval(t); try{ expandAndApplyRanks(); }catch(e){} }
+    },50);
   });
 })();
 </script>
