@@ -75,6 +75,7 @@ try {
     <h1>Blacksox Dugout — Single Game Strategy (v1.0)</h1>
         <div class="actions" id="teamTabs" style="margin-left:auto; display:flex; gap:8px;">
           <button id="teamTab-10U" type="button" class="teamtab active" onclick="window.__switchTeam && window.__switchTeam('10U')">10U</button>
+          <button id="teamTab-11U" type="button" class="teamtab" onclick="window.__switchTeam && window.__switchTeam('11U')">11U</button>
           <button id="teamTab-12U" type="button" class="teamtab" onclick="window.__switchTeam && window.__switchTeam('12U')">12U</button>
         </div>
     
@@ -519,6 +520,19 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
 <script>
 (function(){
   const CSV_12U = [{"Number": 24, "Name": "Anthony", "Primary": "2B", "Secondary": "LF", "Rank": 6}, {"Number": 63, "Name": "Jack F", "Primary": "3B", "Secondary": "1B", "Rank": 5}, {"Number": 27, "Name": "Clark", "Primary": "2B", "Secondary": "1B", "Rank": 9}, {"Number": 23, "Name": "Nolan", "Primary": "CF", "Secondary": "LF", "Rank": 10}, {"Number": 22, "Name": "Rowan", "Primary": "CF", "Secondary": "2B", "Rank": 8}, {"Number": 77, "Name": "Emory", "Primary": "RF", "Secondary": "LF", "Rank": 12}, {"Number": 11, "Name": "Nicky", "Primary": "RF", "Secondary": "LF", "Rank": 11}, {"Number": 21, "Name": "Esteban", "Primary": "3B", "Secondary": "2B", "Rank": 7}, {"Number": 7, "Name": "Manuel", "Primary": "SS", "Secondary": "3B", "Rank": 4}, {"Number": 4, "Name": "Gray", "Primary": "SS", "Secondary": "2B", "Rank": 2}, {"Number": 14, "Name": "Jack J", "Primary": "SS", "Secondary": "2B", "Rank": 3}, {"Number": 74, "Name": "Cole", "Primary": "RF", "Secondary": "LF", "Rank": 13}, {"Number": 8, "Name": "Wat", "Primary": "SS", "Secondary": "3B", "Rank": 1}];
+  const CSV_11U = [
+    {Number: 5, Name: "Arya", Primary: "C", Secondary: "LF", Rank: 6},
+    {Number: 3, Name: "Brooks", Primary: "CF", Secondary: "3B", Rank: 2},
+    {Number: 20, Name: "Calvin", Primary: "SS", Secondary: "2B", Rank: 3},
+    {Number: 24, Name: "Jackson", Primary: "2B", Secondary: "3B", Rank: 7},
+    {Number: 21, Name: "Levon", Primary: "3B", Secondary: "2B", Rank: 11},
+    {Number: 2, Name: "Milo", Primary: "LF", Secondary: "2B", Rank: 9},
+    {Number: 8, Name: "Oscar", Primary: "RF", Secondary: "C", Rank: 8},
+    {Number: 17, Name: "Owen", Primary: "1B", Secondary: "SS", Rank: 4},
+    {Number: 99, Name: "Rhys", Primary: "RF", Secondary: "2B", Rank: 12},
+    {Number: 42, Name: "Robinson", Primary: "SS", Secondary: "C", Rank: 1},
+    {Number: 12, Name: "Sawyer", Primary: "1B", Secondary: "LF", Rank: 10},
+    {Number: 44, Name: "Vaughn", Primary: "3B", Secondary: "1B", Rank: 5}];
   const ranks10U = {"21": 5, "6": 3, "13": 1, "24": 4, "1": 2, "63": 6, "9": 9, "10": 7, "11": 8, "19": 11, "22": 12, "44": 10};
 
   // Always clear storage on page load (fresh start)
@@ -588,22 +602,40 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ setup(); } catch(e){ co
   }
 
   let SNAP_10U=null;
-  function setActive(team){
-    try{ if(!SNAP_10U) { SNAP_10U = clone((typeof PLAYERS!=='undefined'?PLAYERS:window.PLAYERS)||[]); apply10URanks(SNAP_10U);} }catch(e){}
-    if(team==='10U' && SNAP_10U){
-      let tmp=clone(SNAP_10U); apply10URanks(tmp);
-      try{ PLAYERS=tmp;}catch(e){window.PLAYERS=tmp;}
-    } else if(team==='12U'){
-      let strict=csvPlayersStrict();
-      try{ PLAYERS=strict;}catch(e){window.PLAYERS=strict;}
-    }
-    document.getElementById('teamTab-10U')?.classList.toggle('active', team==='10U');
-    document.getElementById('teamTab-12U')?.classList.toggle('active', team==='12U');
-    if(typeof drawRoster==='function') drawRoster();
-    if(typeof updateRosterVisibility==='function') updateRosterVisibility();
-    if(typeof fillSelectors==='function') fillSelectors();
-    try{ expandAndApplyRanks(); }catch(e){}
+ function setActive(team){
+  try{ if(!SNAP_10U) { SNAP_10U = clone((typeof PLAYERS!=='undefined'?PLAYERS:window.PLAYERS)||[]); apply10URanks(SNAP_10U);} }catch(e){}
+  if(team==='10U' && SNAP_10U){
+    let tmp=clone(SNAP_10U); apply10URanks(tmp);
+    try{ PLAYERS=tmp;}catch(e){window.PLAYERS=tmp;}
+  } else if(team==='12U'){
+    let strict=csvPlayersStrict();
+    try{ PLAYERS=strict;}catch(e){window.PLAYERS=strict;}
+  } else if(team==='11U'){
+    let elevenU = (CSV_11U||[]).map((r,i) => {
+      const nm = splitName(r.Name || r.name);
+      const num = toInt(r.Number || r.number || r['#'], i+1);
+      return {
+        id: String(num || (i+1)),
+        number: num || (i+1),
+        first: nm.first,
+        last: nm.last,
+        name: (r.Name || r.name)||'',
+        primary: r.Primary || r.primary || '—',
+        secondary: r.Secondary || r.secondary || '—',
+        rank: toInt(r.Rank || r.rank || r.order || r.priority, i+1),
+        available: true
+      };
+    });
+    try{ PLAYERS=elevenU;}catch(e){window.PLAYERS=elevenU;}
   }
+  document.getElementById('teamTab-10U')?.classList.toggle('active', team==='10U');
+  document.getElementById('teamTab-11U')?.classList.toggle('active', team==='11U');
+  document.getElementById('teamTab-12U')?.classList.toggle('active', team==='12U');
+  if(typeof drawRoster==='function') drawRoster();
+  if(typeof updateRosterVisibility==='function') updateRosterVisibility();
+  if(typeof fillSelectors==='function') fillSelectors();
+  try{ expandAndApplyRanks(); }catch(e){}
+}
   window.__switchTeam=setActive;
 
   (function wrapOnce(){ if(window.__rankWrapApplied) return; window.__rankWrapApplied=true;
